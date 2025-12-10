@@ -28,6 +28,7 @@ BUILD_DIR := build
 	pr-12 \
 	pr-13 \
 	pr-14 \
+	pr-15 \
 	prj-auth-lib \
 	prj-enc-exch
 
@@ -55,6 +56,7 @@ build: \
 	pr-12 \
 	pr-13 \
 	pr-14 \
+	pr-15 \
 	prj-auth-lib \
 	prj-enc-exch
 
@@ -74,6 +76,7 @@ install: build
 	cp "$(BUILD_DIR)/pr-12.pdf" "$(PREFIX)/Презентации/12 Исключения.pdf"
 	cp "$(BUILD_DIR)/pr-13.pdf" "$(PREFIX)/Презентации/13 Виртуальные методы и полиморфизм.pdf"
 	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/Презентации/14 Шаблоны.pdf"
+	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/Презентации/15 Стандартная библиотека.pdf"
 	mkdir -p "$(PREFIX)/Домашние задания"
 	cp "$(BUILD_DIR)/hw-01.pdf" "$(PREFIX)/Домашние задания/01 Hello World.pdf"
 	cp "$(BUILD_DIR)/hw-02.pdf" "$(PREFIX)/Домашние задания/02 Git & Github.pdf"
@@ -116,6 +119,7 @@ help:
 	@printf "pr-12\tbuild presentation pr-12.pdf\n"
 	@printf "pr-13\tbuild presentation pr-13.pdf\n"
 	@printf "pr-14\tbuild presentation pr-14.pdf\n"
+	@printf "pr-15\tbuild presentation pr-15.pdf\n"
 	@printf "prj-auth-lib\tbuild project prj-auth-lib.pdf\n"
 	@printf "prj-enc-exch\tbuild project prj-enc-exch.pdf\n"
 
@@ -133,6 +137,7 @@ pr-11: pr-11.pdf
 pr-12: pr-12.pdf
 pr-13: pr-13.pdf
 pr-14: pr-14.pdf
+pr-15: pr-15.pdf
 
 hw-01: hw-01.pdf
 hw-02: hw-02.pdf
@@ -294,6 +299,13 @@ pr-13.pdf: \
 
 pr-14.pdf: \
 	Presentations/14-Templates/templates.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	Packages/mylisting.sty
+	$(call generate_pdf,$<,$@)
+
+pr-15.pdf: \
+	Presentations/15-Stdlib/stdlib.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
 	Packages/mylisting.sty
