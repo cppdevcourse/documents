@@ -1,0 +1,1631 @@
+\documentclass[compress, 8pt]{beamer}
+
+\usepackage{presentationtemplate}
+\usepackage[askip=3mm, bskip=3mm]{terminal}
+\usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta}
+\usepackage{csquotes}
+\usepackage{tabularray}
+
+\newtcolorbox{task}{
+    colback=yellow!50!white,
+    boxrule=0.02cm,
+    colframe=black,
+    sharp corners,
+    left=0mm,
+    right=0mm,
+    top=0mm,
+    bottom=0mm,
+    before upper={\textbf{Задание}:\:},
+}
+
+\title{Стандартная библиотека С++}
+
+\begin{document}
+
+  \frame[plain]{\titlepage}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Обзор стандартной библиотеки}
+
+    Стандартная библиотека предоставляет:
+    \hfill \break
+
+    \begin{itemize}
+
+      \item средства управления памятью;
+      \item структуры данных и алгоритмы для работы с ними;
+      \item средства для ввода/вывода;
+      \item подмножество часто использумых математических операций;
+      \item средства для работы с файловыми системами;
+      \item run-time type information (RTTI)\footnote{\url{https://en.cppreference.com/w/cpp/utility/rtti.html}};
+      \item средства для параллельных вычислений (на основе потоков или lock-free);
+      \item и др.
+
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Исполнение стандартной библиотеки}
+
+    Стандартная библиотека состоит из:
+    \hfill \break
+
+    \begin{itemize}
+
+      \item заголовочных файлов;
+      \item разделяемой библиотеки: libstdc++.so (GNU) и libc++.so (LLVM);
+      \item статической библиотеки: libstdc++.a (GNU) и libc++.a (LLVM).
+      
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Линковка со стандартной библиотекой}
+
+    Можно отключить линковку со стандартной библиотекой:
+
+    \begin{mytitledinplacelisting}[minted language=cpp]{main.cpp}
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, world!\n";
+}
+    \end{mytitledinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ \colorbox{yellow}{-nostdlib++} main.cpp -o main}!
+<path>/bin/ld: /tmp/ccm2JkGA.o: in function `main':
+main.cpp:(.text+0xa): undefined reference to `std::cout'
+<path>/bin/ld: main.cpp:(.text+0xf): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)'
+collect2: error: ld returned 1 exit status
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Линковка со стандартной библиотекой}
+
+    В большинстве случаев отключать линковку со стандартной библиотекой не требуется.
+    Если программа не использует стандартную библиотеку,
+    то на размер файла это не повлияет.
+    Но может быть важно скомпилировать программу так, чтобы в его динамической
+    секции не было стандартной библиотеки.
+
+    \begin{mytitledinplacelisting}[minted language=cpp]{main.cpp}
+int main() {
+    volatile int* p {};
+    *p = 1;
+}
+    \end{mytitledinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -nostdlib++ main.cpp -o main}!
+!\shellcommand{du -sb main}!
+!\colorbox{green}{15768}!   main
+!\shellcommand{ldd main}!
+linux-vdso.so.1 (0x00007f313bbfb000)
+...
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Линковка со стандартной библиотекой}
+
+    У скомпилированной без \verb|-nostdlib++| программы тот же размер,
+    но без установленной в системе \verb|libstdc++.so.6| она не запустится,
+    хотя в ее коде и не требуется код из стандартной библиотеки.
+
+    \begin{terminalwindow}
+!\shellcommand{c++ main.cpp -o main}!
+!\shellcommand{du -sb main}!
+!\colorbox{green}{15768}!   main
+!\shellcommand{ldd main}!
+linux-vdso.so.1 (0x00007f313bbfb000)
+!\colorbox{yellow}{libstdc++.so.6}! => <path>/lib/libstdc++.so.6 (0x00007f313b800000)
+...
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Линковка со стандартной библиотекой}
+
+    Со стандартной библиотекой можно слинковаться статически.
+    Программа больше не будет зависеть от предустановленной \verb|libstdc++.so|,
+    но вырастет в размере.
+
+    \begin{terminalwindow}
+!\shellcommand{c++ main.cpp -o dynamic}!
+!\shellcommand{du -sh dynamic}!
+!\colorbox{green}{16K}!     dynamic
+!\shellcommand{c++ \colorbox{yellow}{-static-libstdc++} main.cpp -o static}!
+!\shellcommand{du -sh static}!
+!\colorbox{pink}{1,4M}!    static
+!\shellcommand{ldd static}!
+linux-vdso.so.1 (0x00007f57eadc2000
+...
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Standard template library (STL)}
+
+    В стандартной библиотеке выделяют часть, которая называется
+    \textit{Standard template library}\footnotemark{} (STL).
+    По большей части она представляет собой набор шаблонов классов и функций
+    с параметром-типом.
+
+    \footnotetext{\url{https://en.wikipedia.org/wiki/Standard\_Template\_Library}}
+
+    \hfill \break
+    STL состоит из:
+
+    \begin{itemize}
+      \item контейнеров;
+      \item итераторов;
+      \item алгоритмов.
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{STL: контейнеры}
+
+    Контейнеры для структур данных с последовательным доступом.
+    Доступ к элементам имеет асимптотическую сложность
+    $O\left(1\right)$ для контейнеров с последовательным расположением
+    элементов и $O\left(n\right)$ для остальных.
+    \hfill \break
+
+    \begin{tblr}{
+      colspec = {|X[0.3,l]|X[0.7,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Контейнер & Описание \\
+      \texttt{array} & Массив с размером, известным во время компиляции. \\
+      \texttt{vector} & Динамический массив. \\
+      \texttt{deque} & Двухсторонняя очередь. \\
+      \texttt{forward\_list} & Односвязный список. \\
+      \texttt{list} & Двусвязный список. \\
+    \end{tblr}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{STL: контейнеры}
+
+    Ассоциативные контейнеры хранят данные в сортированном виде,
+    поиск по ним имеет $O\left(log\left(n\right)\right)$ асимптотическую
+    сложность.
+    \hfill \break
+
+    \begin{tblr}{
+      colspec = {|X[0.3,l]|X[0.7,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Контейнер & Описание \\
+      \texttt{set} & Коллекция уникальных ключей. \\
+      \texttt{map} & Коллекция пар ключ-значение, ключи уникальны. \\
+      \texttt{multiset} & Коллекция ключей. \\
+      \texttt{multimap} & Коллекция пар ключ-значение. \\
+    \end{tblr}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{STL: контейнеры}
+
+    Ассоциативные несортированные контейнеры используют хэширование
+    для определения расположения элемента,
+    поиск по ним имеет $O\left(1\right)$ асимптотическую
+    сложность.
+    \hfill \break
+
+    \begin{tblr}{
+      colspec = {|X[0.3,l]|X[0.7,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Контейнер & Описание \\
+      \texttt{unordered\_set} & Коллекция уникальных ключей. \\
+      \texttt{unordered\_map} & Коллекция пар ключ-значение, ключи уникальны. \\
+      \texttt{unordered\_multiset} & Коллекция ключей. \\
+      \texttt{unordered\_multimap} & Коллекция пар ключ-значение. \\
+    \end{tblr}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{STL: контейнеры}
+
+    Иные контейнеры:
+    \hfill \break
+
+    \begin{tblr}{
+      colspec = {|X[0.3,l]|X[0.7,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Контейнер & Описание \\
+      \texttt{string} & Строка. \\
+      \texttt{stack} & LIFO структура (стек). \\
+      \texttt{queue} & FIFO структура (односторонняя очередь). \\
+      \texttt{span} &
+      Невладеющий контейнер последовательно расположенных в памяти элементов
+      (C++20). \\
+    \end{tblr}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::array}}
+
+    Элементы \texttt{std::array}\footnotemark{} располагаются на стеке.
+    Этот шаблон имеет второй параметр-константу, которая определяет размер
+    массива.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/array.html}}
+
+    \begin{myinplacelisting}[minted language=cpp]
+#include <array>
+#include <cstddef>
+#include <print>
+
+struct Foo {};
+
+std::size_t foo() { return 30; }
+constexpr std::size_t bar() { return 50; }
+
+int main() {
+    std::array<int, 3> arr0 {1, 2, 3};
+    std::array<int, foo()> arr1 {}; // compile error
+    std::array<Foo, bar()> arr2 {};
+
+    std::println("size: {}", arr0.size()); // prints 3
+    std::println("empty: {}", arr0.empty()); // prints 'false'
+}
+    \end{myinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Доступ к элементам \texttt{std::array}}
+
+    Доступ к элементам массива возможен через оператор \verb|[]|
+    и \\ метод \texttt{at}.
+    Последний генерирует исключение, когда индекс выходит
+    за границы массива.
+
+    \begin{task}
+      Порассуждайте о преимуществах и недостатках метода \texttt{at}.
+    \end{task}
+
+    \begin{myinplacelisting}[minted language=cpp]
+#include <array>
+#include <print>
+#include <stdexcept>
+
+int main() {
+    const std::array<int, 3> arr {1, 2, 3};
+
+    try {
+        std::println("{}", arr[100]); // prints garbage, UB
+        std::println("{}", arr.data()[100]); // same UB
+        std::println("{}", arr.at(100)); // throws
+    }
+    catch (const std::out_of_range& err) {
+        std::println("Error: {}", err.what());
+    }
+}
+    \end{myinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Псевдонимы типов \texttt{std::array}}
+
+    В шаблонах-контейнеров обычно определен набор из псевдонимов.
+
+    \begin{mycppinplacelisting}
+#include <array>
+
+int main() {
+    using Array = std::array<int, 0u>;
+
+    Array::value_type i = 0; // int
+    Array::size_type s = 0u; // std::size_t
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Range-based цикл \texttt{for} и контейнеры}
+
+    Совместно STL контейнерами можно использовать вариацию циклa \texttt{for},
+    которая называется \textit{range-based for loop}\footnotemark{}.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/language/range-for.html}}
+
+    \begin{myinplacelisting}[minted language=cpp]
+#include <array>
+#include <print>
+
+int main() {
+    std::array<int, 3> arr {3, 2, 1};
+
+    for (int& i : arr) {
+        i += 1;
+    }
+
+    for (const int i : arr) {
+        std::println("i = {}", i);
+    }
+}
+    \end{myinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Range-based цикл \texttt{for} и пользовательские типы}
+
+    Range-based цикл можно использовать не только с контейнерами.
+    Ожидается, что типы, используемые в этом цикле, имеют определенный
+    набор методов.
+
+    \begin{mycppinplacelisting}
+#include <print>
+
+struct Foo {
+    int* begin() { return &values[0]; }
+    int* end() { return &values[2] + 1; }
+private:
+    int values[3] = {1, 2, 3};
+};
+
+int main() {
+    Foo foo {};
+
+    for (auto value : foo) {
+        std::println("value = {}", value);
+    }
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::vector}}
+
+    Элементы \texttt{std::vector}\footnotemark{} расположены в куче последовательно.
+    Большинство методов \texttt{std::array} имеют смысл и для вектора,
+    они объявлены с теми же именами.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/vector.html}}
+
+    \begin{mycppinplacelisting}
+#include <print>
+#include <vector>
+
+int main() {
+    std::vector<int> v {1, 2, 3};
+
+    std::println("size: {}", v.size());
+    std::println("max_size: {}", v.max_size());
+    std::println("empty: {}", v.empty());
+    std::println("data: {}", (void*){v.data()});
+
+    std::println("v[0]: {}", v[0]);
+    std::println("v.at(0): {}", v.at(0));
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Изменение размера \texttt{std::vector}}
+
+    В отличие от \texttt{std::array}, вектор может изменять
+    свой размер.
+
+    \begin{task}
+      Поразмышляйте, что выведет программа и почему?
+      Метод \texttt{data} возвращает адрес первого элемента
+      вектора в куче.
+    \end{task}
+
+    \begin{mycppinplacelisting}
+#include <print>
+#include <vector>
+
+int main() {
+    std::vector<int> v {1, 2, 3};
+
+    std::println("data: {}", (void*){v.data()});
+
+    v.resize(100);
+
+    std::println("data: {}", (void*){v.data()});
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Ёмкость \texttt{std::vector}}
+
+    Для вектора, помимо размера, определено понятие \textit{ёмкости}.
+    \hfill \break
+
+    \begin{itemize}
+      \item Размер \textemdash \space количество элементов в векторе.
+      \item Ёмкость \textemdash \space характеризует размер непрерывного
+        участка памяти в куче, в котором хранятся элементы вектора.
+    \end{itemize}
+    \hfill \break
+
+    Управление ёмкостью вектор происходит в полуавтоматическом режиме:
+    некоторые методы приводят к изменению ёмкости косвенно,
+    некоторые \textemdash \space напрямую.
+
+    \begin{task}
+      Поразмышляйте, зачем потребовалось вводить понятие ёмкости? 
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Изменение ёмкости \texttt{std::vector}}
+
+    Ёмкость вектора растет при добавлении нового элемента массива,
+    но не обязательно на размер его элемента.
+    При удалении элемента из массива ёмкость не уменьшается.
+
+    \begin{mycppinplacelisting}
+int main() {
+    std::vector<int> v {};
+    std::println("size: {}, capacity: {}",
+        v.size(), v.capacity());
+
+    for (int i = 0; i < 5; i++) {
+        v.push_back(i); // add element to the end of vector
+        std::println("size: {}, capacity: {}",
+            v.size(), v.capacity());
+    }
+
+    while (!v.empty()) {
+        v.pop_back(); // remove last element from vector
+        std::println("size: {}, capacity: {}",
+            v.size(), v.capacity());
+    }
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Изменение ёмкости \texttt{std::vector}}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+size: 0, capacity: 0
+size: 1, capacity: 1
+size: 2, capacity: 2
+size: 3, capacity: 4
+size: 4, capacity: 4
+size: 5, capacity: 8
+size: 4, capacity: 8
+size: 3, capacity: 8
+size: 2, capacity: 8
+size: 1, capacity: 8
+size: 0, capacity: 8
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Ручное управление ёмкостью \texttt{std::vector}}
+
+    Пример ручного управления ёмкостью вектора:
+
+    \begin{mycppinplacelisting}
+#include <print>
+#include <vector>
+
+bool condition();
+
+int main() {
+    std::vector<int> v {};
+    v.reserve(10); // expand capacity to 10 elements
+
+    for (int i = 0; i < 10 && condition(); i++) {
+        v.push_back(i); // no reallocations!
+    }
+
+    v.shrink_to_fit(); // free unused memory
+}
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Подумайте, какие недостатки могут быть у метода \verb|shrink_to_fit|?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Удаление элемента \texttt{std::vector}}
+
+    Для удаления произвольного элемента используется метод
+    \texttt{erase}.
+    Он принимает \textit{итератор}\footnotemark{}, который
+    указывает на удаляемый элемент.
+
+    \footnotetext{Определение итератора дается позднее.}
+
+    \begin{mycppinplacelisting}
+using Vector = std::vector<int>;
+
+void print(const Vector& v) {
+    std::println("data:\t{}", (const void*){v.data()});
+    std::println("size:\t{}", v.size());
+    std::print("vector:\t");
+    for (auto it : v) { std::print("{} ", it); }
+    std::println();
+}
+
+int main() {
+    std::vector<int> v {1, 2, 3, 4, 5};
+    print(v);
+    v.erase(v.cbegin() + 1);
+    print(v);
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Удаление элемента \texttt{std::vector}}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+data:   !\colorbox{green}{0x5627d277f2b0}!
+size:   5
+vector: 1 2 3 4 5
+data:   !\colorbox{green}{0x5627d277f2b0}!
+size:   4
+vector: 1 3 4 5
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    Для иллюстрации того, что происходит с элементами \texttt{std::vector} \\
+    при вызове различных модифицирующих методов, определим класс
+    \texttt{Pirate}.
+
+    \begin{mycppinplacelisting}
+struct Pirate {
+    // ...
+    Pirate(std::string_view name) noexcept : name(name) {}
+    Pirate(const Pirate& o) noexcept : name(o.name) {
+        std::println("Copy {}", name);
+    }
+    Pirate& operator=(const Pirate& o) noexcept {
+        std::println("{} copy assignment", name);
+        // ...
+    }
+    Pirate(Pirate&& o) noexcept : name(std::move(o.name)) {
+        std::println("Move {}", name);
+    }
+    Pirate& operator=(Pirate&& o) noexcept {
+        std::println("{} move assignment", name);
+        // ...
+    }
+    std::string name;
+};
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    \begin{task}
+      Объясните ошибку компиляции в коде на листинге ниже.
+    \end{task}
+
+    \begin{mycppinplacelisting}
+struct Pirate {
+    Pirate() = delete;
+    // ...
+};
+
+int main() {
+    std::vector<Pirate> v;
+    v.resize(10); // compile error
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    Если конструктор перемещения не объявлен \texttt{noexcept},
+    то компилятор будет по-умолчанию использовать копирование
+    при изменении размера вектора.
+
+    \begin{mycppinplacelisting}
+struct Pirate {
+    // ...
+    Pirate(Pirate&& o) : name(std::move(o.name)) {/*...*/}
+};
+
+int main() {
+    std::vector<Pirate> v {Pirate{"Jack"}, Pirate{"Hector"}};
+    v.resize(4);
+}
+    \end{mycppinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+Copy Jack
+Copy Hector
+Copy Jack
+Copy Hector
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    \begin{mycppinplacelisting}
+struct Pirate {
+    // ...
+    Pirate(Pirate&& o) |\colorbox{yellow}{noexcept}| : name(std::move(o.name))
+    {/*...*/}
+};
+
+int main() {
+    std::vector<Pirate> v {Pirate{"Jack"}, Pirate{"Hector"}};
+    v.resize(4);
+}
+    \end{mycppinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+Copy Jack
+Copy Hector
+Move Jack
+Move Hector
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    \begin{task}
+      Объясните вывод программы.
+    \end{task}
+
+    \begin{mycppinplacelisting}
+int main() {
+    std::vector<Pirate> v = {
+        Pirate{"Jack"}, Pirate{"Hector"},
+        Pirate{"Davy"}, Pirate{"Joshamee"}
+    };
+    v.erase(v.cbegin() + 2);
+    v.erase(v.cbegin() + 2);
+}
+    \end{mycppinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+Copy Jack
+Copy Hector
+Copy Davy
+Copy Joshamee
+Joshamee move assignment
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    Для вставки элементов можно использовать метод \texttt{insert}.
+
+    \begin{task}
+      Объясните вывод программы.
+    \end{task}
+
+    \begin{columns}[T]
+
+      \begin{column}{0.5\textwidth}
+        
+        \begin{mycppinplacelisting}
+int main() {
+    std::vector<Pirate> v = {
+        Pirate{"Jack"},
+        Pirate{"Davy"},
+        Pirate{"Joshamee"}
+    };
+    v.insert(v.cbegin() + 1,
+        Pirate{"Hector"});
+}
+        \end{mycppinplacelisting}
+
+      \end{column}
+      
+      \begin{column}{0.5\textwidth}
+        
+        \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp}!
+!\shellcommand{./a.out}!
+Copy Jack
+Copy Davy
+Copy Joshamee
+Move Hector
+Move Jack
+Move Davy
+Move Joshamee
+        \end{terminalwindow}
+
+      \end{column}
+      
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    \begin{task}
+      Объясните вывод программы.
+    \end{task}
+
+    \begin{columns}[T]
+
+      \begin{column}{0.5\textwidth}
+        
+        \begin{mycppinplacelisting}
+int main() {
+    std::vector<Pirate> v = {
+        Pirate{"Jack"},
+        Pirate{"Davy"},
+        Pirate{"Joshamee"}
+    };
+    const Pirate hector
+        { "Hector" };
+    v.insert(v.cbegin() + 1,
+         std::move(hector));
+}
+        \end{mycppinplacelisting}
+
+      \end{column}
+      
+      \begin{column}{0.5\textwidth}
+        
+        \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp}!
+!\shellcommand{./a.out}!
+Copy Jack
+Copy Davy
+Copy Joshamee
+Copy Hector
+Move Jack
+Move Davy
+Move Joshamee
+        \end{terminalwindow}
+
+      \end{column}
+      
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Время жизни элементов \texttt{std::vector}}
+
+    Для конструирования объектов прямо в куче можно использовать
+    метод \texttt{emplace}.
+
+    \begin{columns}[T]
+
+      \begin{column}{0.5\textwidth}
+        
+        \begin{mycppinplacelisting}
+int main() {
+    std::vector<Pirate> v = {
+        Pirate{"Jack"},
+        Pirate{"Davy"},
+        Pirate{"Joshamee"}
+    };
+    v.emplace(v.cbegin() + 1,
+         "Hector");
+}
+        \end{mycppinplacelisting}
+
+      \end{column}
+      
+      \begin{column}{0.5\textwidth}
+        
+        \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp}!
+!\shellcommand{./a.out}!
+Copy Jack
+Copy Davy
+Copy Joshamee
+Move Jack
+Move Davy
+Move Joshamee
+        \end{terminalwindow}
+
+      \end{column}
+      
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Специализация \texttt{std::vector<bool>}}
+
+    Для \texttt{std::vector} определена частичная специализация
+    для типа \texttt{bool}.
+    В этой специализации каждый элемент занимает ровно один байт.
+
+    \hfill \break
+    Многими эта специализация рассматривается как архитектурная ошибка
+    в стандарте.
+
+    \begin{mycppinplacelisting}
+std::vector<bool> v = {
+    true, true, true, true,
+    false, false, false, false,
+    true, true, true, true,
+    false, false, false, false
+};
+
+bool& b = v[0]; // compile error
+bool* pb = &v[0]; // compile error
+bool* pb1 = v.data(); // compiler error
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Почему это решение считается неудачным?
+      Какие есть альтернативы для представления массива
+      байт?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::list}}
+
+    В случаях, когда операции удаления/вставки планируются частыми,
+    а непрерывность расположения элементов в памяти не так важна,
+    лучше воспользоваться двусвязным списком \texttt{std::list}\footnotemark{}.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/list.html}}
+
+    \begin{columns}[T]
+
+      \begin{column}{0.6\textwidth}
+        
+        \begin{mycppinplacelisting}
+int main() {
+    std::list<Pirate> l = {
+        Pirate{"Jack"},
+        Pirate{"Davy"},
+        Pirate{"Joshamee"}
+    };
+    auto pos =
+      std::next(l.cbegin(), 1);
+    l.insert(pos, Pirate{"Hector"});
+    l.erase(std::next(pos, 1));
+}
+        \end{mycppinplacelisting}
+
+      \end{column}
+      
+      \begin{column}{0.4\textwidth}
+        
+        \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp}!
+!\shellcommand{./a.out}!
+Copy Jack
+Copy Davy
+Copy Joshamee
+Move Hector
+        \end{terminalwindow}
+
+      \end{column}
+      
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::set}}
+
+    Для хранения набора уникальных значений можно использовать
+    \texttt{std::set}\footnote{\url{https://en.cppreference.com/w/cpp/container/set.html}}.
+    Обычно \texttt{std::set} реализован как красно-черное
+    дерево\footnote{\url{https://en.wikipedia.org/wiki/Red\%E2\%80\%93black\_tree}}.
+
+    \hfill \break
+    \enquote{Уникальность} значений в \texttt{std::set} проверяется оператором
+    \texttt{<} (\enquote{меньше}).
+    Для двух элементов \texttt{std::set} $a$ и $b$ никогда не должно быть
+    истонно выражение:
+
+    \begin{equation*}
+      \neg \left(a < b\right) \land \neg \left(b < a\right)
+    \end{equation*}
+
+    \hfill \break
+    \begin{task}
+      Почему обязательным требованием к типам в \texttt{std::set} является
+      именно оператор \texttt{<}, а не \texttt{==}?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Сортировка в \texttt{std::set}}
+
+    \begin{mycppinplacelisting}
+struct Pirate {
+    std::string name;
+    bool operator<(const Pirate& o) const noexcept {
+        return name < o.name;
+    }
+};
+
+int main() {
+    std::set<Pirate> s = {
+        Pirate{"Jack"}, Pirate{"Davy"},
+        Pirate{"Joshamee"}, Pirate{"Hector"}
+    };
+
+    for (const auto& it: s) std::print("{} ", it.name);
+    std::println();
+}
+    \end{mycppinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+Davy Hector Jack Joshamee
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Сортировка в \texttt{std::set}}
+
+    Алгоритм сортировки можно определять отдельно от типа-значения.
+    Для этого надо определить тип-компаратор.
+
+    \begin{mycppinplacelisting}
+struct Pirate { std::string name; };
+
+struct Alphabet {
+    bool operator()(const Pirate& l, const Pirate& r) const {
+        return l.name < r.name;
+    }
+};
+
+struct ReverseAlphabet {
+    bool operator()(const Pirate& l, const Pirate& r) const {
+        return l.name > r.name;
+    }
+};
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Сортировка в \texttt{std::set}}
+
+    Тип-компаратор затем можно использовать вторым аргументом
+    шаблона.
+
+    \begin{mycppinplacelisting}
+int main() {
+    std::set<Pirate, Alphabet> s0 = {
+        Pirate{"Jack"}, Pirate{"Davy"},
+        Pirate{"Joshamee"}, Pirate{"Hector"}
+    };
+    print(s0);
+    std::set<Pirate, ReverseAlphabet> s1 = {
+        Pirate{"Jack"}, Pirate{"Davy"},
+        Pirate{"Joshamee"}, Pirate{"Hector"}
+    };
+    print(s1);
+}
+    \end{mycppinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+Davy Hector Jack Joshamee
+Joshamee Jack Hector Davy
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Сортировка в \texttt{std::set}}
+
+    Неправильно написанный компаратор может привести к неожиданным
+    и нежелательным последствиям.
+
+    \begin{mycppinplacelisting}
+struct BadComparator {
+    bool operator()(const Pirate& l, const Pirate& r) const {
+        return l.name != r.name;
+    }
+};
+
+int main() {
+    std::set<Pirate, BadComparator> s = {
+        Pirate{"Jack"}, Pirate{"Davy"},
+        Pirate{"Joshamee"}, Pirate{"Hector"}
+    };
+    for (const auto& it: s) std::print("{} ", it.name);
+}
+    \end{mycppinplacelisting}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+Davy Jack
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::multiset}}
+
+    Для хранения упорядоченных неуникальных элементов можно
+    использовать \texttt{std::multiset}\footnotemark{}.
+    По реализации (красно-черное дерево) и интерфейсу
+    (наборму методов) он почти идентичен \texttt{std::set}.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/multiset.html}}
+
+    \begin{mycppinplacelisting}
+std::multiset<int> s {2, 4, 2, 1};
+// prints 1 2 2 4
+for (const auto& v : s) {
+    std::print("{} ", v);
+}
+std::println();
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::map}}
+
+    Для хранения пар \enquote{ключ}-\enquote{значение} с уникальными
+    ключами используется \texttt{std::map}\footnotemark{}.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/map.html}}
+
+    \begin{mycppinplacelisting}
+std::map<int, std::string> users = {
+    {11, "Ben"},
+    {22, "Sean"},
+    {33, "Alfie"}
+};
+
+std::println("{} has ID=11", users[11]);
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Рассмотренные ранее ассоциативные контейнеры обеспечивают
+    $O\left(log\left(n\right)\right)$ асимптотическую сложность
+    для поиска, вставки или удаления элемента.
+
+    \hfill \break
+    Ассоциативные несортированные контейнеры реализованы не в виде
+    красно-черных деревьев, а в виде
+    хэш-таблиц\footnote{\url{https://en.wikipedia.org/wiki/Hash\_table}}.
+    Это обеспечивает константное время доступа к элементу
+    $O\left(1\right)$\footnote{В лучшем случае.}.
+
+    \hfill \break
+    \centering
+
+    \textit{Ключ} $K$
+    \rightarrow \space $Hash\left(K\right)$
+    \rightarrow \space позиция в контейнере.
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Попробуем создать хэш-таблицу для пользовательского типа.
+    Определим тип \texttt{User} следующим образом:
+
+    \begin{mycppinplacelisting}
+struct User {
+    std::string name;
+    std::string surname;
+};
+    \end{mycppinplacelisting}
+
+    Зададимся целью иметь возможность создавать хэш-таблицы,
+    в которых пользователи будут ключами:
+
+    \begin{mycppinplacelisting}
+std::unordered_set<User> users {
+    {"Sean", "Bean"},
+    {"Alfie", "Allen"}
+};
+
+std::unordered_map<User, IllegallyCollectedPersonalData> {
+    /*...*/
+};
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Для этого нам требуется определить алгоритм хэширования
+    типа \texttt{User}.
+    В общем случае для этого можно написать отдельный класс и передать
+    его в параметры шаблона, но в данном примере используется
+    специализация класса \texttt{std::hash}, которая является
+    аргументом шаблона по-умолчанию.
+
+    \begin{mycppinplacelisting}
+template<>
+struct std::hash<User> {
+    size_t operator()(const User& user) const {
+        std::string full = user.name + user.surname;
+        std::size_t result {};
+        for (const char c : full) {
+            result += static_cast<std::size_t>(c);
+        }
+        return result;
+    }
+};
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Подумайте, хороший ли это алгоритм хэширования?
+      Если он плохой, как можно его улучшить?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Чуть более лучшим, но все еще не идеальным, будет
+    вычисление хэшей полей класса при помощи \texttt{std::hash}
+    и применение исключающего \enquote{ИЛИ}.
+
+    \begin{mycppinplacelisting}
+template<>
+struct std::hash<User> {
+    size_t operator()(const User& user) const {
+        std::hash<std::string> hash;
+        return hash(user.name) ^ (hash(user.surname) << 1);
+    }
+};
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Зачем ко второму операнду \verb|^| применен сдвиг на один бит
+      влево?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    В такой реализации вычисление хэша для \verb|{"Sean", "Bean"}|
+
+    \begin{mycppinplacelisting}
+std::hash<User> hash {};
+std::println("{}", hash({"Sean", "Bean"}));
+    \end{mycppinplacelisting}
+
+    даст число \texttt{11047437158245152129}.
+
+    \hfill \break
+    В ассоциативных несортированных контейнерах хэш каким-то образом
+    используется для поиска элементов в таблице.
+    Наивный подход предполагает использование хэша как индекса массива.
+    Означает ли это, что \texttt{std::unordered\_set} создаст
+    массив такого размера для контейнера из одного элемента?
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Для вычисления слота на основе хэша используется
+    остаток деления на общее числo слотов.
+
+    \begin{mycppinplacelisting}
+const User sean {"Sean", "Bean"};
+const User alfie {"Alfie", "Allen"};
+
+std::hash<User> hash {};
+
+std::unordered_set<User> users {sean, alfie};
+
+std::println("Buckets count: {}", users.bucket_count()); // 13
+std::println("Alfie's bucket: {}", users.bucket(alfie)); // 10
+std::println("Computed bucket: {}",
+  hash(alfie) % users.bucket_count()); // 10
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Коллизии в хэш-таблицах}
+
+    Идеальных хэш-функций не бывает.
+    Для любой хэш-функции всегда найдется пара аргументов,
+    для которых будет одинаковый результат.
+    Такая ситуация называется коллизией\footnotemark{}.
+
+    \footnotetext{\url{https://en.wikipedia.org/wiki/Hash\_collision}}
+
+    \hfill \break
+    Пример чуть более, чем неидеальной, хэш-функции:
+
+    \begin{mycppinplacelisting}
+template<>
+struct std::hash<::User> {
+    size_t operator()(const User& user) const {
+        std::hash<std::string> hash;
+        if (user.name == "Sean") {
+            return hash(user.name);
+        }
+        return hash(user.name) ^ (hash(user.surname) << 1);
+    }
+};
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Коллизии в хэш-таблицах}
+
+    Для решения коллизий слоты хэш-таблиц могут хранить
+    более одного значения.
+    Если для двух ключей случилась коллизия, их значения
+    кладутся в один слот.
+
+    \begin{mycppinplacelisting}
+const User sean0 {"Sean", "Bean"};
+const User sean1 {"Sean", "Astin"};
+const User alfie {"Alfie", "Allen"};
+
+std::unordered_set<User> users {sean0, sean1, alfie};
+
+std::println("Bean's bucket: {}", users.bucket(sean0)); // 3
+std::println("Astin's bucket: {}", users.bucket(sean1)); // 3
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Коллизии в хэш-таблицах}
+
+    Для поиска элемента в одном бакете используется оператор сравнения
+    \verb|==|.
+    Поэтому для типа \textemdash \space параметр шаблона
+    хэш-таблицы должен быть определен соответствующий оператор.
+
+    \begin{mycppinplacelisting}
+struct User {
+    std::string name;
+    std::string surname;
+    bool operator==(const User& user) const {
+        return name == user.name && surname == user.surname;
+    }
+};
+    \end{mycppinplacelisting}
+
+    Поэтому в худшем случае хэш-таблица дает линейный поиск
+    $O\left(n\right)$.
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Итераторы}
+
+    Другой частью STL являются
+    \textit{итераторы}\footnote{\url{https://en.cppreference.com/w/cpp/iterator.html}}.
+    Итераторы являются обобщением указателей на элементы массива, позволяющие работать
+    с наборами данных (например, контейнерами из STL) разных типов
+    единообразным способом.
+
+    \begin{mycppinplacelisting}
+template <class C>
+void print_backward(const C& c) {
+    for (auto it = c.crbegin(); it != c.crend(); ++it) {
+        std::print("{} ", *it);
+    }
+    std::println();
+}
+
+int main() {
+    const std::array<int, 3> arr {1, 2, 3};
+    print_backward(arr); // 3 2 1
+
+    const std::set<const char*> names = {
+        "James", "Jack", "John"
+    };
+    print_backward(names); // John Jack James
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Итераторы}
+
+    Другим назначение операторов является обощением работы
+    над подмножеством элементов в контейнере.
+
+    \begin{mycppinplacelisting}
+template <std::forward_iterator It>
+It::value_type sum(It beg, It end) {
+    typename It::value_type value {};
+    for (; beg != end; ++beg) {
+        value += *beg;
+    }
+    return value;
+}
+
+int main() {
+    const std::vector<int> array = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    for (auto it = array.cbegin(); it != array.cend(); ++it) {
+        std::println("sum = {}", sum(it, array.cend()));
+    }
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Получение итераторов}
+
+    Большинство контейнеров поддерживает методы
+    \texttt{begin()}, \texttt{cbegin()}, \texttt{end()} для
+    получения различных видов итераторов на первый или последний элемент
+    контейнера.
+
+    \begin{mycppinplacelisting}
+std::vector<int> v {/*...*/};
+v.begin();
+v.rbegin();
+v.cend();
+// ...
+    \end{mycppinplacelisting}
+
+    Это можно сделать и при помощи аналогичных свободных функций.
+
+    \begin{mycppinplacelisting}
+std::vector<int> v {/*...*/};
+std::begin(v);
+std::rbegin(v);
+std::cend(v);
+// ...
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Виды итераторов}
+
+    Есть несколько разновидностей итераторов:
+
+    \hfill \break
+    \begin{itemize}
+
+      \item Обычный итератор \texttt{iterator}.
+        Позволяет менять объект, на который ссылается.
+        \texttt{begin} указывает на первый элемент
+        контейнера, \texttt{end} на следующий за последним.
+        Инкремент итератора сместит его на следующий элемент
+        последовательности.
+
+      \item Константный итератор \texttt{const\_iterator}.
+        Аналогичен обычному итератору, но не позволяет менять
+        объект, на который ссылается.
+        Можно получить методами \texttt{cbegin} и \texttt{cend}.
+
+      \item Реверсивный итератор \texttt{reverse\_iterator}.
+        \texttt{rbegin} ссылается на последний объект,
+        \texttt{rend} \textemdash \space на виртуальный элемент, предшествующий
+        первому.
+        Позволяет менять объект, на который ссылается.
+
+      \item Реверсивный константный итератор: \texttt{crbegin} и
+        \texttt{crend}.
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Разыменование \texttt{end} итераторов}
+
+    Как и в случае с обычными указателями, разрешается создавать
+    итераторы, указывающий на следующий после последнего элемент
+    последовательности.
+
+    \begin{mycppinplacelisting}
+int array[] = {1, 2, 3};
+array + 3; // valid pointer
+array + 4; // invalid pointer
+
+std::vector<int> v {1, 2, 3};
+v.end(); // valid iterator
+v.begin() + 3; // also valid
+v.rbegin() + 3; // also valid
+v.begin() + 4; // invalid iterator
+    \end{mycppinplacelisting}
+
+    Однако, разыменовывание такого итератора является
+    неопределенным поведением.
+
+    \begin{mycppinplacelisting}
+int i = *(v.cend());
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Инвалидация итераторов}
+
+    Для каждого контейнера определены правила инвалидации
+    итераторов.
+    Эти правила связаны с представлении последовательности
+    элементов в памяти.
+    Пример инвалидации итератора для вектора:
+
+    \begin{mycppinplacelisting}
+std::vector<int> v {1, 3, 4};
+auto it = v.begin() + 1;
+std::println("{}", *it);
+
+v.insert(v.cbegin(), 2);
+// iterator invalidated!
+std::println("{}", *it);
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Почему ивалидировался итератор? Как это связано с его реализацией
+      в стандартной библиотеке?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Инвалидация итераторов}
+
+    Типичная ошибка \textemdash \space инвалидация итератора
+    при изменении контейнера в цикле:
+
+    \begin{mycppinplacelisting}
+for (auto it = v.cbegin(); it != v.cend(); ++it) {
+    if (*it % 2 == 0) {
+        v.erase(it);
+    }
+}
+    \end{mycppinplacelisting}
+
+    Исправление:
+
+    \begin{mycppinplacelisting}
+for (auto it = v.cbegin(); it != v.cend();) {
+    if (*it % 2 == 0) {
+        it = v.erase(it);
+    }
+    else { ++it; }
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+\end{document}
