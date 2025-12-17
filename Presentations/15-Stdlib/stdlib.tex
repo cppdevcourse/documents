@@ -1146,4 +1146,486 @@ Davy Jack
 
   \end{frame}
 
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::multiset}}
+
+    Для хранения упорядоченных неуникальных элементов можно
+    использовать \texttt{std::multiset}\footnotemark{}.
+    По реализации (красно-черное дерево) и интерфейсу
+    (наборму методов) он почти идентичен \texttt{std::set}.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/multiset.html}}
+
+    \begin{mycppinplacelisting}
+std::multiset<int> s {2, 4, 2, 1};
+// prints 1 2 2 4
+for (const auto& v : s) {
+    std::print("{} ", v);
+}
+std::println();
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::map}}
+
+    Для хранения пар \enquote{ключ}-\enquote{значение} с уникальными
+    ключами используется \texttt{std::map}\footnotemark{}.
+
+    \footnotetext{\url{https://en.cppreference.com/w/cpp/container/map.html}}
+
+    \begin{mycppinplacelisting}
+std::map<int, std::string> users = {
+    {11, "Ben"},
+    {22, "Sean"},
+    {33, "Alfie"}
+};
+
+std::println("{} has ID=11", users[11]);
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Рассмотренные ранее ассоциативные контейнеры обеспечивают
+    $O\left(log\left(n\right)\right)$ асимптотическую сложность
+    для поиска, вставки или удаления элемента.
+
+    \hfill \break
+    Ассоциативные несортированные контейнеры реализованы не в виде
+    красно-черных деревьев, а в виде
+    хэш-таблиц\footnote{\url{https://en.wikipedia.org/wiki/Hash\_table}}.
+    Это обеспечивает константное время доступа к элементу
+    $O\left(1\right)$\footnote{В лучшем случае.}.
+
+    \hfill \break
+    \centering
+
+    \textit{Ключ} $K$
+    \rightarrow \space $Hash\left(K\right)$
+    \rightarrow \space позиция в контейнере.
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Попробуем создать хэш-таблицу для пользовательского типа.
+    Определим тип \texttt{User} следующим образом:
+
+    \begin{mycppinplacelisting}
+struct User {
+    std::string name;
+    std::string surname;
+};
+    \end{mycppinplacelisting}
+
+    Зададимся целью иметь возможность создавать хэш-таблицы,
+    в которых пользователи будут ключами:
+
+    \begin{mycppinplacelisting}
+std::unordered_set<User> users {
+    {"Sean", "Bean"},
+    {"Alfie", "Allen"}
+};
+
+std::unordered_map<User, IllegallyCollectedPersonalData> {
+    /*...*/
+};
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Для этого нам требуется определить алгоритм хэширования
+    типа \texttt{User}.
+    В общем случае для этого можно написать отдельный класс и передать
+    его в параметры шаблона, но в данном примере используется
+    специализация класса \texttt{std::hash}, которая является
+    аргументом шаблона по-умолчанию.
+
+    \begin{mycppinplacelisting}
+template<>
+struct std::hash<User> {
+    size_t operator()(const User& user) const {
+        std::string full = user.name + user.surname;
+        std::size_t result {};
+        for (const char c : full) {
+            result += static_cast<std::size_t>(c);
+        }
+        return result;
+    }
+};
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Подумайте, хороший ли это алгоритм хэширования?
+      Если он плохой, как можно его улучшить?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Чуть более лучшим, но все еще не идеальным, будет
+    вычисление хэшей полей класса при помощи \texttt{std::hash}
+    и применение исключающего \enquote{ИЛИ}.
+
+    \begin{mycppinplacelisting}
+template<>
+struct std::hash<User> {
+    size_t operator()(const User& user) const {
+        std::hash<std::string> hash;
+        return hash(user.name) ^ (hash(user.surname) << 1);
+    }
+};
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Зачем ко второму операнду \verb|^| применен сдвиг на один бит
+      влево?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    В такой реализации вычисление хэша для \verb|{"Sean", "Bean"}|
+
+    \begin{mycppinplacelisting}
+std::hash<User> hash {};
+std::println("{}", hash({"Sean", "Bean"}));
+    \end{mycppinplacelisting}
+
+    даст число \texttt{11047437158245152129}.
+
+    \hfill \break
+    В ассоциативных несортированных контейнерах хэш каким-то образом
+    используется для поиска элементов в таблице.
+    Наивный подход предполагает использование хэша как индекса массива.
+    Означает ли это, что \texttt{std::unordered\_set} создаст
+    массив такого размера для контейнера из одного элемента?
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Хэш-таблицы}
+
+    Для вычисления слота на основе хэша используется
+    остаток деления на общее числo слотов.
+
+    \begin{mycppinplacelisting}
+const User sean {"Sean", "Bean"};
+const User alfie {"Alfie", "Allen"};
+
+std::hash<User> hash {};
+
+std::unordered_set<User> users {sean, alfie};
+
+std::println("Buckets count: {}", users.bucket_count()); // 13
+std::println("Alfie's bucket: {}", users.bucket(alfie)); // 10
+std::println("Computed bucket: {}",
+  hash(alfie) % users.bucket_count()); // 10
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Коллизии в хэш-таблицах}
+
+    Идеальных хэш-функций не бывает.
+    Для любой хэш-функции всегда найдется пара аргументов,
+    для которых будет одинаковый результат.
+    Такая ситуация называется коллизией\footnotemark{}.
+
+    \footnotetext{\url{https://en.wikipedia.org/wiki/Hash\_collision}}
+
+    \hfill \break
+    Пример чуть более, чем неидеальной, хэш-функции:
+
+    \begin{mycppinplacelisting}
+template<>
+struct std::hash<::User> {
+    size_t operator()(const User& user) const {
+        std::hash<std::string> hash;
+        if (user.name == "Sean") {
+            return hash(user.name);
+        }
+        return hash(user.name) ^ (hash(user.surname) << 1);
+    }
+};
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Коллизии в хэш-таблицах}
+
+    Для решения коллизий слоты хэш-таблиц могут хранить
+    более одного значения.
+    Если для двух ключей случилась коллизия, их значения
+    кладутся в один слот.
+
+    \begin{mycppinplacelisting}
+const User sean0 {"Sean", "Bean"};
+const User sean1 {"Sean", "Astin"};
+const User alfie {"Alfie", "Allen"};
+
+std::unordered_set<User> users {sean0, sean1, alfie};
+
+std::println("Bean's bucket: {}", users.bucket(sean0)); // 3
+std::println("Astin's bucket: {}", users.bucket(sean1)); // 3
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Коллизии в хэш-таблицах}
+
+    Для поиска элемента в одном бакете используется оператор сравнения
+    \verb|==|.
+    Поэтому для типа \textemdash \space параметр шаблона
+    хэш-таблицы должен быть определен соответствующий оператор.
+
+    \begin{mycppinplacelisting}
+struct User {
+    std::string name;
+    std::string surname;
+    bool operator==(const User& user) const {
+        return name == user.name && surname == user.surname;
+    }
+};
+    \end{mycppinplacelisting}
+
+    Поэтому в худшем случае хэш-таблица дает линейный поиск
+    $O\left(n\right)$.
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Итераторы}
+
+    Другой частью STL являются
+    \textit{итераторы}\footnote{\url{https://en.cppreference.com/w/cpp/iterator.html}}.
+    Итераторы являются обобщением указателей на элементы массива, позволяющие работать
+    с наборами данных (например, контейнерами из STL) разных типов
+    единообразным способом.
+
+    \begin{mycppinplacelisting}
+template <class C>
+void print_backward(const C& c) {
+    for (auto it = c.crbegin(); it != c.crend(); ++it) {
+        std::print("{} ", *it);
+    }
+    std::println();
+}
+
+int main() {
+    const std::array<int, 3> arr {1, 2, 3};
+    print_backward(arr); // 3 2 1
+
+    const std::set<const char*> names = {
+        "James", "Jack", "John"
+    };
+    print_backward(names); // John Jack James
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Итераторы}
+
+    Другим назначение операторов является обощением работы
+    над подмножеством элементов в контейнере.
+
+    \begin{mycppinplacelisting}
+template <std::forward_iterator It>
+It::value_type sum(It beg, It end) {
+    typename It::value_type value {};
+    for (; beg != end; ++beg) {
+        value += *beg;
+    }
+    return value;
+}
+
+int main() {
+    const std::vector<int> array = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    for (auto it = array.cbegin(); it != array.cend(); ++it) {
+        std::println("sum = {}", sum(it, array.cend()));
+    }
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Получение итераторов}
+
+    Большинство контейнеров поддерживает методы
+    \texttt{begin()}, \texttt{cbegin()}, \texttt{end()} для
+    получения различных видов итераторов на первый или последний элемент
+    контейнера.
+
+    \begin{mycppinplacelisting}
+std::vector<int> v {/*...*/};
+v.begin();
+v.rbegin();
+v.cend();
+// ...
+    \end{mycppinplacelisting}
+
+    Это можно сделать и при помощи аналогичных свободных функций.
+
+    \begin{mycppinplacelisting}
+std::vector<int> v {/*...*/};
+std::begin(v);
+std::rbegin(v);
+std::cend(v);
+// ...
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Виды итераторов}
+
+    Есть несколько разновидностей итераторов:
+
+    \hfill \break
+    \begin{itemize}
+
+      \item Обычный итератор \texttt{iterator}.
+        Позволяет менять объект, на который ссылается.
+        \texttt{begin} указывает на первый элемент
+        контейнера, \texttt{end} на следующий за последним.
+        Инкремент итератора сместит его на следующий элемент
+        последовательности.
+
+      \item Константный итератор \texttt{const\_iterator}.
+        Аналогичен обычному итератору, но не позволяет менять
+        объект, на который ссылается.
+        Можно получить методами \texttt{cbegin} и \texttt{cend}.
+
+      \item Реверсивный итератор \texttt{reverse\_iterator}.
+        \texttt{rbegin} ссылается на последний объект,
+        \texttt{rend} \textemdash \space на виртуальный элемент, предшествующий
+        первому.
+        Позволяет менять объект, на который ссылается.
+
+      \item Реверсивный константный итератор: \texttt{crbegin} и
+        \texttt{crend}.
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Разыменование \texttt{end} итераторов}
+
+    Как и в случае с обычными указателями, разрешается создавать
+    итераторы, указывающий на следующий после последнего элемент
+    последовательности.
+
+    \begin{mycppinplacelisting}
+int array[] = {1, 2, 3};
+array + 3; // valid pointer
+array + 4; // invalid pointer
+
+std::vector<int> v {1, 2, 3};
+v.end(); // valid iterator
+v.begin() + 3; // also valid
+v.rbegin() + 3; // also valid
+v.begin() + 4; // invalid iterator
+    \end{mycppinplacelisting}
+
+    Однако, разыменовывание такого итератора является
+    неопределенным поведением.
+
+    \begin{mycppinplacelisting}
+int i = *(v.cend());
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Инвалидация итераторов}
+
+    Для каждого контейнера определены правила инвалидации
+    итераторов.
+    Эти правила связаны с представлении последовательности
+    элементов в памяти.
+    Пример инвалидации итератора для вектора:
+
+    \begin{mycppinplacelisting}
+std::vector<int> v {1, 3, 4};
+auto it = v.begin() + 1;
+std::println("{}", *it);
+
+v.insert(v.cbegin(), 2);
+// iterator invalidated!
+std::println("{}", *it);
+    \end{mycppinplacelisting}
+
+    \begin{task}
+      Почему ивалидировался итератор? Как это связано с его реализацией
+      в стандартной библиотеке?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Инвалидация итераторов}
+
+    Типичная ошибка \textemdash \space инвалидация итератора
+    при изменении контейнера в цикле:
+
+    \begin{mycppinplacelisting}
+for (auto it = v.cbegin(); it != v.cend(); ++it) {
+    if (*it % 2 == 0) {
+        v.erase(it);
+    }
+}
+    \end{mycppinplacelisting}
+
+    Исправление:
+
+    \begin{mycppinplacelisting}
+for (auto it = v.cbegin(); it != v.cend();) {
+    if (*it % 2 == 0) {
+        it = v.erase(it);
+    }
+    else { ++it; }
+}
+    \end{mycppinplacelisting}
+
+  \end{frame}
+
 \end{document}
