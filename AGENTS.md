@@ -4,10 +4,10 @@ LaTeX sources for the Russian-language course "Введение в разраб�
 
 ## Build
 
-- Toolchain comes from Nix via Flakes (`flake.nix` + committed `flake.lock`, nixpkgs pinned in `inputs`): `nix develop` opens a shell with texliveFull + GNU Make; `nix shell .#make .#texlive` is the throwaway variant; `nix build` compiles every document into a `result/` tree (`Презентации/`, `Домашние задания/`, `Проекты/`) via the Makefile's `install` target. Host LaTeX tools may be missing or mismatched — always build inside Nix.
-- For a single doc inside the dev shell: `make pr-01`, `make hw-07`, `make prj-auth-lib` (list via `make help`). In `nix build` output lands in `result/`; in the Makefile sandbox it lands in `build/` — both are gitignored, so stale PDFs are easy to miss.
-- The homework starter repos (`Homeworks/NN-*/hw-project`, `Homeworks/07-Real48/submodule`) are also flake inputs pinned in `flake.nix`, so `nix build` is hermetic without a `git submodule update`. Keep those pins in sync with `.gitmodules` when a submodule is bumped, then re-run `nix flake lock`.
-- The default branch is `master`; GitHub Actions only run on push/PR to `master`. CI runs `nix build` on that branch (see `.github/workflows/compile.yml`).
+- Toolchain comes from Nix via Flakes (`flake.nix` + committed `flake.lock`, nixpkgs pinned in `inputs`): `nix develop` opens a shell with texliveFull, gnumake and zip; `nix build` compiles every document via the Makefile's `install` target into a `result/` tree (`presentations/`, `homeworks/`, `projects/`). Host LaTeX tools may be missing or mismatched — always build inside Nix. `nix flake check` runs a `nixpkgs-fmt` formatting check on the flake.
+- For a single doc inside the dev shell: `make pr-01`, `make hw-07`, `make prj-auth-lib` (list via `make help`). In `nix build` output lands in `result/` (a gitignored symlink into the nix store); with plain `make` it lands in `build/` (also gitignored) — so stale PDFs are easy to miss.
+- The homework starter repos (`Homeworks/NN-*/hw-project`, `Homeworks/07-Real48/submodule`) are git submodules pulled into the flake source via `self.submodules = true`, so `nix build` is hermetic without a local `git submodule update`. To bump one, update the submodule and commit the new gitlink — there are no flake input pins to keep in sync.
+- The default branch is `master`; GitHub Actions only run on push/PR to `master`. CI runs `nix build` on that branch (see `.github/workflows/compile.yml`); the Release workflow (`.github/workflows/release.yml`) reuses it to publish per-category zips on releases.
 
 ## Layout
 
@@ -18,12 +18,13 @@ LaTeX sources for the Russian-language course "Введение в разраб�
 
 ## Editing documents
 
+- PDFs are built with lualatex: `.latexmkrc` selects the engine (with `-shell-escape`, required by minted) and sets `out_dir=build`; the Makefile passes `-lualatex` as well.
 - Code shown on slides is included from real files with `\myinputlisting{<dirname>/}{<file>}` (minted); inline snippets use `mycppinplacelisting` / `myinplacelisting`; command sessions use `terminalwindow` with `\shellcommand{...}`. It is teaching material, so C++ snippets must be accurate and compile.
 - Makefile prerequisites glob source files per directory, but GNU make treats `**` as a single directory level (stacked `**` used for presentations 04–10). After editing a nested `.cpp`/`.h`, force a rebuild with `make clean` or `rm build/<name>.pdf`.
 
 ## Adding a document
 
-Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in three places: the `.PHONY` list, the `build:` prerequisites, and the `install:` copy rules (deliverable filenames are Cyrillic, e.g. `«Презентации/01 Введение.pdf»`).
+Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in three places: the `.PHONY` list, the `build:` prerequisites, and the `install:` copy rules (deliverable filenames are ASCII, e.g. `presentations/01-intro.pdf`).
 
 ## Versioning
 
