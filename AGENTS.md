@@ -4,9 +4,10 @@ LaTeX sources for the Russian-language course "Введение в разраб�
 
 ## Build
 
-- Toolchain comes from Nix: run `nix-shell` (provides texliveFull + GNU Make via a pinned nixpkgs tarball in `shell.nix`). Host LaTeX tools may be missing or mismatched; always build inside `nix-shell`.
-- `make` builds every PDF; build one doc with e.g. `make pr-01`, `make hw-07`, `make prj-auth-lib` (list via `make help`). Output lands in `build/`, not next to sources (set in `.latexmkrc`: lualatex, `-shell-escape` for minted). `build/` is gitignored, so stale PDFs are easy to miss.
-- The default branch is `master`; GitHub Actions only run on push/PR to `master`. Always verify with `make install` too — CI runs `PREFIX=install make install -j $(nproc)`.
+- Toolchain comes from Nix via Flakes (`flake.nix` + committed `flake.lock`, nixpkgs pinned in `inputs`): `nix develop` opens a shell with texliveFull + GNU Make; `nix shell .#make .#texlive` is the throwaway variant; `nix build` compiles every document into a `result/` tree (`Презентации/`, `Домашние задания/`, `Проекты/`) via the Makefile's `install` target. Host LaTeX tools may be missing or mismatched — always build inside Nix.
+- For a single doc inside the dev shell: `make pr-01`, `make hw-07`, `make prj-auth-lib` (list via `make help`). In `nix build` output lands in `result/`; in the Makefile sandbox it lands in `build/` — both are gitignored, so stale PDFs are easy to miss.
+- The homework starter repos (`Homeworks/NN-*/hw-project`, `Homeworks/07-Real48/submodule`) are also flake inputs pinned in `flake.nix`, so `nix build` is hermetic without a `git submodule update`. Keep those pins in sync with `.gitmodules` when a submodule is bumped, then re-run `nix flake lock`.
+- The default branch is `master`; GitHub Actions only run on push/PR to `master`. CI runs `nix build` on that branch (see `.github/workflows/compile.yml`).
 
 ## Layout
 
