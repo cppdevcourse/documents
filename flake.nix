@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
+    self.submodules = true;
   };
 
   outputs = { self, nixpkgs, ... }: let

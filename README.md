@@ -7,7 +7,7 @@
 
 ## Зависимости
 
-- Пакетный менеджер [Nix](https://nix.dev/install-nix.html)
+- Пакетный менеджер [Nix](https://nix.dev/install-nix.html) >= 2.27
 
 Все остальные зависимости (texlive, GNU Make и др.) устанавливаются при помощи Nix.
 Проект использует [Nix Flakes](https://nixos.wiki/wiki/Flakes).
