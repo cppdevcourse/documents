@@ -26,6 +26,13 @@
 
       nativeBuildInputs = buildInputs;
 
+      preBuild = ''
+        export HOME=$TMPDIR
+        export TEXMFVAR=$TMPDIR/texmf-var
+        export TEXMFCACHE=$TMPDIR/texmf-cache
+        luaotfload-tool --update --force
+      '';
+
       buildPhase = ''
         runHook preBuild
         make clean
