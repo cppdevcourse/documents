@@ -61,33 +61,33 @@ build: \
 	prj-enc-exch
 
 install: build
-	mkdir -p "$(PREFIX)/Презентации"
-	cp "$(BUILD_DIR)/pr-01.pdf" "$(PREFIX)/Презентации/01 Введение.pdf"
-	cp "$(BUILD_DIR)/pr-02.pdf" "$(PREFIX)/Презентации/02 Фазы трансляции.pdf"
-	cp "$(BUILD_DIR)/pr-03.pdf" "$(PREFIX)/Презентации/03 Фундаментальные типы.pdf"
-	cp "$(BUILD_DIR)/pr-04.pdf" "$(PREFIX)/Презентации/04 Переменные.pdf"
-	cp "$(BUILD_DIR)/pr-05.pdf" "$(PREFIX)/Презентации/05 Условия.pdf"
-	cp "$(BUILD_DIR)/pr-06.pdf" "$(PREFIX)/Презентации/06 Циклы.pdf"
-	cp "$(BUILD_DIR)/pr-07.pdf" "$(PREFIX)/Презентации/07 Указатели и ссылки.pdf"
-	cp "$(BUILD_DIR)/pr-08.pdf" "$(PREFIX)/Презентации/08 Массивы.pdf"
-	cp "$(BUILD_DIR)/pr-09.pdf" "$(PREFIX)/Презентации/09 Функции.pdf"
-	cp "$(BUILD_DIR)/pr-10.pdf" "$(PREFIX)/Презентации/10 Приведения типов.pdf"
-	cp "$(BUILD_DIR)/pr-11.pdf" "$(PREFIX)/Презентации/11 Структуры и классы.pdf"
-	cp "$(BUILD_DIR)/pr-12.pdf" "$(PREFIX)/Презентации/12 Исключения.pdf"
-	cp "$(BUILD_DIR)/pr-13.pdf" "$(PREFIX)/Презентации/13 Виртуальные методы и полиморфизм.pdf"
-	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/Презентации/14 Шаблоны.pdf"
-	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/Презентации/15 Стандартная библиотека.pdf"
-	mkdir -p "$(PREFIX)/Домашние задания"
-	cp "$(BUILD_DIR)/hw-01.pdf" "$(PREFIX)/Домашние задания/01 Hello World.pdf"
-	cp "$(BUILD_DIR)/hw-02.pdf" "$(PREFIX)/Домашние задания/02 Git & Github.pdf"
-	cp "$(BUILD_DIR)/hw-03.pdf" "$(PREFIX)/Домашние задания/03 Two Sum.pdf"
-	cp "$(BUILD_DIR)/hw-04.pdf" "$(PREFIX)/Домашние задания/04 The Guessing Game.pdf"
-	cp "$(BUILD_DIR)/hw-05.pdf" "$(PREFIX)/Домашние задания/05 Hide Secret.pdf"
-	cp "$(BUILD_DIR)/hw-06.pdf" "$(PREFIX)/Домашние задания/06 LIFO Stack.pdf"
-	cp "$(BUILD_DIR)/hw-07.pdf" "$(PREFIX)/Домашние задания/07 Real48.pdf"
-	mkdir -p "$(PREFIX)/Проекты"
-	cp "$(BUILD_DIR)/prj-auth-lib.pdf" "$(PREFIX)/Проекты/Библиотека идентификации и аутентификации.pdf"
-	cp "$(BUILD_DIR)/prj-enc-exch.pdf" "$(PREFIX)/Проекты/Baremetal шифрование обмена.pdf"
+	mkdir -p "$(PREFIX)/presentations"
+	cp "$(BUILD_DIR)/pr-01.pdf" "$(PREFIX)/presentations/01-intro.pdf"
+	cp "$(BUILD_DIR)/pr-02.pdf" "$(PREFIX)/presentations/02-phases-of-translation.pdf"
+	cp "$(BUILD_DIR)/pr-03.pdf" "$(PREFIX)/presentations/03-fundamental-types.pdf"
+	cp "$(BUILD_DIR)/pr-04.pdf" "$(PREFIX)/presentations/04-variables.pdf"
+	cp "$(BUILD_DIR)/pr-05.pdf" "$(PREFIX)/presentations/05-conditional-statement.pdf"
+	cp "$(BUILD_DIR)/pr-06.pdf" "$(PREFIX)/presentations/06-loops.pdf"
+	cp "$(BUILD_DIR)/pr-07.pdf" "$(PREFIX)/presentations/07-pointers-and-references.pdf"
+	cp "$(BUILD_DIR)/pr-08.pdf" "$(PREFIX)/presentations/08-arrays.pdf"
+	cp "$(BUILD_DIR)/pr-09.pdf" "$(PREFIX)/presentations/09-functions.pdf"
+	cp "$(BUILD_DIR)/pr-10.pdf" "$(PREFIX)/presentations/10-type-conversions.pdf"
+	cp "$(BUILD_DIR)/pr-11.pdf" "$(PREFIX)/presentations/11-structures-and-classes.pdf"
+	cp "$(BUILD_DIR)/pr-12.pdf" "$(PREFIX)/presentations/12-exceptions.pdf"
+	cp "$(BUILD_DIR)/pr-13.pdf" "$(PREFIX)/presentations/13-dynamic-dispatch.pdf"
+	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-templates.pdf"
+	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-standard-library.pdf"
+	mkdir -p "$(PREFIX)/homeworks"
+	cp "$(BUILD_DIR)/hw-01.pdf" "$(PREFIX)/homeworks/01-hello-world.pdf"
+	cp "$(BUILD_DIR)/hw-02.pdf" "$(PREFIX)/homeworks/02-git-github.pdf"
+	cp "$(BUILD_DIR)/hw-03.pdf" "$(PREFIX)/homeworks/03-two-sum.pdf"
+	cp "$(BUILD_DIR)/hw-04.pdf" "$(PREFIX)/homeworks/04-the-guessing-game.pdf"
+	cp "$(BUILD_DIR)/hw-05.pdf" "$(PREFIX)/homeworks/05-hide-secret.pdf"
+	cp "$(BUILD_DIR)/hw-06.pdf" "$(PREFIX)/homeworks/06-lifo-stack.pdf"
+	cp "$(BUILD_DIR)/hw-07.pdf" "$(PREFIX)/homeworks/07-real48.pdf"
+	mkdir -p "$(PREFIX)/projects"
+	cp "$(BUILD_DIR)/prj-auth-lib.pdf" "$(PREFIX)/projects/authentication-library.pdf"
+	cp "$(BUILD_DIR)/prj-enc-exch.pdf" "$(PREFIX)/projects/baremetal-encryption.pdf"
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -371,7 +371,7 @@ prj-auth-lib.pdf: \
 	Packages/mylisting.sty \
 	Projects/projectstemplate.sty
 	$(call generate_pdf,$<,$@)
-	
+
 prj-enc-exch.pdf: \
 	Projects/Baremetal-exchange-encryption/exchange-encryption.tex \
 	$(wildcard Projects/images/*.jpg) \

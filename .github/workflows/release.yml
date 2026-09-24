@@ -21,26 +21,26 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          filename: 'Presentations.zip'
-          path: 'Презентации/'
+          filename: 'presentations.zip'
+          directory: 'presentations/'
 
       - name: Archive homeworks
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          filename: 'Homeworks.zip'
-          path: 'Домашние задания/'
+          filename: 'homeworks.zip'
+          directory: 'homeworks/'
 
       - name: Archive projects
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          filename: 'Projects.zip'
-          path: 'Проекты/'
+          filename: 'projects.zip'
+          directory: 'projects/'
 
       - name: Upload PDFs to GitHub Release
         uses: ncipollo/release-action@v1.12.0
         with:
           allowUpdates: true
-          artifacts: '*.zip'
+          artifacts: '**/*.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
