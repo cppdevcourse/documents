@@ -22,10 +22,9 @@ jobs:
     - name: Compile PDF files
       run: |
         nix build
-        cp -rL result install
 
     - name: Upload PDF files
       uses: actions/upload-artifact@v4
       with:
         name: pdf
-        path: install/
+        path: result/
