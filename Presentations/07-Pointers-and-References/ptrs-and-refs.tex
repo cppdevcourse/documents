@@ -403,7 +403,7 @@ if (!p) {
         {main.cpp}
 
     \begin{terminalwindow}
-!\shellcommand{g++ main.cpp -o main && ./main}!
+!\shellcommand{g++ main.cpp -o main \&\& ./main}!
 Segmentation fault (core dumped)
     \end{terminalwindow}
 
@@ -473,7 +473,7 @@ int main() {
         {main.cpp}
 
     \begin{terminalwindow}
-!\shellcommand{g++ main.cpp -o main && ./main}!
+!\shellcommand{g++ main.cpp -o main \&\& ./main}!
 p = 0x7fff5e0dd8c0, (p + 1) = 0x7fff5e0dd8c8
 !\shellcommand{./main}!
 p = 0x7ffd6cd3aa20, (p + 1) = 0x7ffd6cd3aa28

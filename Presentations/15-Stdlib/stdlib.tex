@@ -61,7 +61,7 @@
       \item заголовочных файлов;
       \item разделяемой библиотеки: libstdc++.so (GNU) и libc++.so (LLVM);
       \item статической библиотеки: libstdc++.a (GNU) и libc++.a (LLVM).
-      
+
     \end{itemize}
 
   \end{frame}
@@ -505,7 +505,7 @@ int main() {
     некоторые \textemdash \space напрямую.
 
     \begin{task}
-      Поразмышляйте, зачем потребовалось вводить понятие ёмкости? 
+      Поразмышляйте, зачем потребовалось вводить понятие ёмкости?
     \end{task}
 
   \end{frame}
@@ -547,7 +547,7 @@ int main() {
     Вывод программы с листинга на прошлом слайде:
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 size: 0, capacity: 0
 size: 1, capacity: 1
 size: 2, capacity: 2
@@ -632,7 +632,7 @@ int main() {
     Вывод программы с листинга на прошлом слайде:
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 data:   !\colorbox{green}{0x5627d277f2b0}!
 size:   5
 vector: 1 2 3 4 5
@@ -718,7 +718,7 @@ int main() {
     \end{mycppinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 Copy Jack
 Copy Hector
 Copy Jack
@@ -745,7 +745,7 @@ int main() {
     \end{mycppinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 Copy Jack
 Copy Hector
 Move Jack
@@ -774,7 +774,7 @@ int main() {
     \end{mycppinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 Copy Jack
 Copy Hector
 Copy Davy
@@ -797,7 +797,7 @@ Joshamee move assignment
     \begin{columns}[T]
 
       \begin{column}{0.5\textwidth}
-        
+
         \begin{mycppinplacelisting}
 int main() {
     std::vector<Pirate> v = {
@@ -811,9 +811,9 @@ int main() {
         \end{mycppinplacelisting}
 
       \end{column}
-      
+
       \begin{column}{0.5\textwidth}
-        
+
         \begin{terminalwindow}
 !\shellcommand{c++ -std=c++23 main.cpp}!
 !\shellcommand{./a.out}!
@@ -827,7 +827,7 @@ Move Joshamee
         \end{terminalwindow}
 
       \end{column}
-      
+
     \end{columns}
 
   \end{frame}
@@ -843,7 +843,7 @@ Move Joshamee
     \begin{columns}[T]
 
       \begin{column}{0.5\textwidth}
-        
+
         \begin{mycppinplacelisting}
 int main() {
     std::vector<Pirate> v = {
@@ -859,9 +859,9 @@ int main() {
         \end{mycppinplacelisting}
 
       \end{column}
-      
+
       \begin{column}{0.5\textwidth}
-        
+
         \begin{terminalwindow}
 !\shellcommand{c++ -std=c++23 main.cpp}!
 !\shellcommand{./a.out}!
@@ -875,7 +875,7 @@ Move Joshamee
         \end{terminalwindow}
 
       \end{column}
-      
+
     \end{columns}
 
   \end{frame}
@@ -890,7 +890,7 @@ Move Joshamee
     \begin{columns}[T]
 
       \begin{column}{0.5\textwidth}
-        
+
         \begin{mycppinplacelisting}
 int main() {
     std::vector<Pirate> v = {
@@ -904,9 +904,9 @@ int main() {
         \end{mycppinplacelisting}
 
       \end{column}
-      
+
       \begin{column}{0.5\textwidth}
-        
+
         \begin{terminalwindow}
 !\shellcommand{c++ -std=c++23 main.cpp}!
 !\shellcommand{./a.out}!
@@ -919,7 +919,7 @@ Move Joshamee
         \end{terminalwindow}
 
       \end{column}
-      
+
     \end{columns}
 
   \end{frame}
@@ -970,7 +970,7 @@ bool* pb1 = v.data(); // compiler error
     \begin{columns}[T]
 
       \begin{column}{0.6\textwidth}
-        
+
         \begin{mycppinplacelisting}
 int main() {
     std::list<Pirate> l = {
@@ -986,9 +986,9 @@ int main() {
         \end{mycppinplacelisting}
 
       \end{column}
-      
+
       \begin{column}{0.4\textwidth}
-        
+
         \begin{terminalwindow}
 !\shellcommand{c++ -std=c++23 main.cpp}!
 !\shellcommand{./a.out}!
@@ -999,7 +999,7 @@ Move Hector
         \end{terminalwindow}
 
       \end{column}
-      
+
     \end{columns}
 
   \end{frame}
@@ -1055,7 +1055,7 @@ int main() {
     \end{mycppinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 Davy Hector Jack Joshamee
     \end{terminalwindow}
 
@@ -1109,7 +1109,7 @@ int main() {
     \end{mycppinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 Davy Hector Jack Joshamee
 Joshamee Jack Hector Davy
     \end{terminalwindow}
@@ -1140,7 +1140,7 @@ int main() {
     \end{mycppinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 main.cpp -o main && ./main}!
+!\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
 Davy Jack
     \end{terminalwindow}
 

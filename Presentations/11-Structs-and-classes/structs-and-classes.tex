@@ -733,11 +733,11 @@ int main() {
     \end{myinplacelisting}
 
     \begin{terminalwindow}
-!\shellcommand{c++ main.cpp -o main && ./main}!
+!\shellcommand{c++ main.cpp -o main \&\& ./main}!
 -100
 0
     \end{terminalwindow}
-  
+
 \end{frame}
 
 \begin{frame}[fragile]
@@ -776,10 +776,10 @@ int main() {
 
     \begin{itemize}
         \item Default constructor
-        \item Copy constructor 
-        \item Move constructor 
-        \item Copy assignment operator 
-        \item Move assignment operator 
+        \item Copy constructor
+        \item Move constructor
+        \item Copy assignment operator
+        \item Move assignment operator
         \item Destructor
     \end{itemize}
 
@@ -791,7 +791,7 @@ int main() {
 
     Конструктор копирования позволяет переопределить логику создания
     копии объекта.
-    
+
     \begin{myinplacelisting}[minted language=cpp]
 struct Foo {
     Foo(int i) : ptr(new int) { *ptr = i; }
@@ -1016,7 +1016,7 @@ int main() {
     Если в классе определены \textit{деструктор}, \textit{конструктор копирования} или
     \textit{copy assignment operator}, то, вероятнее всего, требуется определить и
     \textit{конструктор перемещения} и \textit{move assignment operator}.
-    
+
 
 \end{frame}
 
