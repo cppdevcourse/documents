@@ -6,13 +6,6 @@ BUILD_DIR := build
 	build \
 	clean \
 	help \
-	hw-01 \
-	hw-02 \
-	hw-03 \
-	hw-04 \
-	hw-05 \
-	hw-06 \
-	hw-07 \
 	install \
 	pr-01 \
 	pr-02 \
@@ -28,20 +21,11 @@ BUILD_DIR := build
 	pr-12 \
 	pr-13 \
 	pr-14 \
-	pr-15 \
-	prj-auth-lib \
-	prj-enc-exch
+	pr-15
 
 all: build
 
 build: \
-	hw-01 \
-	hw-02 \
-	hw-03 \
-	hw-04 \
-	hw-05 \
-	hw-06 \
-	hw-07 \
 	pr-01 \
 	pr-02 \
 	pr-03 \
@@ -56,9 +40,7 @@ build: \
 	pr-12 \
 	pr-13 \
 	pr-14 \
-	pr-15 \
-	prj-auth-lib \
-	prj-enc-exch
+	pr-15
 
 install: build
 	mkdir -p "$(PREFIX)/presentations"
@@ -77,17 +59,6 @@ install: build
 	cp "$(BUILD_DIR)/pr-13.pdf" "$(PREFIX)/presentations/13-dynamic-dispatch.pdf"
 	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-templates.pdf"
 	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-standard-library.pdf"
-	mkdir -p "$(PREFIX)/homeworks"
-	cp "$(BUILD_DIR)/hw-01.pdf" "$(PREFIX)/homeworks/01-hello-world.pdf"
-	cp "$(BUILD_DIR)/hw-02.pdf" "$(PREFIX)/homeworks/02-git-github.pdf"
-	cp "$(BUILD_DIR)/hw-03.pdf" "$(PREFIX)/homeworks/03-two-sum.pdf"
-	cp "$(BUILD_DIR)/hw-04.pdf" "$(PREFIX)/homeworks/04-the-guessing-game.pdf"
-	cp "$(BUILD_DIR)/hw-05.pdf" "$(PREFIX)/homeworks/05-hide-secret.pdf"
-	cp "$(BUILD_DIR)/hw-06.pdf" "$(PREFIX)/homeworks/06-lifo-stack.pdf"
-	cp "$(BUILD_DIR)/hw-07.pdf" "$(PREFIX)/homeworks/07-real48.pdf"
-	mkdir -p "$(PREFIX)/projects"
-	cp "$(BUILD_DIR)/prj-auth-lib.pdf" "$(PREFIX)/projects/authentication-library.pdf"
-	cp "$(BUILD_DIR)/prj-enc-exch.pdf" "$(PREFIX)/projects/baremetal-encryption.pdf"
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -97,13 +68,6 @@ help:
 	@printf "build\tbuild all presentations and homeworks\n"
 	@printf "clean\tremove build artifacts\n"
 	@printf "help\tprint this message\n"
-	@printf "hw-01\tbuild homework hw-01.pdf\n"
-	@printf "hw-02\tbuild homework hw-02.pdf\n"
-	@printf "hw-03\tbuild homework hw-03.pdf\n"
-	@printf "hw-04\tbuild homework hw-04.pdf\n"
-	@printf "hw-05\tbuild homework hw-05.pdf\n"
-	@printf "hw-06\tbuild homework hw-06.pdf\n"
-	@printf "hw-07\tbuild homework hw-07.pdf\n"
 	@printf "install\tinstall all presentations and homeworks\n"
 	@printf "pr-01\tbuild presentation pr-01.pdf\n"
 	@printf "pr-02\tbuild presentation pr-02.pdf\n"
@@ -120,8 +84,6 @@ help:
 	@printf "pr-13\tbuild presentation pr-13.pdf\n"
 	@printf "pr-14\tbuild presentation pr-14.pdf\n"
 	@printf "pr-15\tbuild presentation pr-15.pdf\n"
-	@printf "prj-auth-lib\tbuild project prj-auth-lib.pdf\n"
-	@printf "prj-enc-exch\tbuild project prj-enc-exch.pdf\n"
 
 pr-01: pr-01.pdf
 pr-02: pr-02.pdf
@@ -138,17 +100,6 @@ pr-12: pr-12.pdf
 pr-13: pr-13.pdf
 pr-14: pr-14.pdf
 pr-15: pr-15.pdf
-
-hw-01: hw-01.pdf
-hw-02: hw-02.pdf
-hw-03: hw-03.pdf
-hw-04: hw-04.pdf
-hw-05: hw-05.pdf
-hw-06: hw-06.pdf
-hw-07: hw-07.pdf
-
-prj-auth-lib: prj-auth-lib.pdf
-prj-enc-exch: prj-enc-exch.pdf
 
 define generate_pdf
 	TEXINPUTS='$(shell pwd)//:' \
@@ -309,72 +260,4 @@ pr-15.pdf: \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-01.pdf: \
-	Homeworks/01-Hello-World/hello_world.tex \
-	Homeworks/homeworktemplate.sty \
-	$(wildcard Homeworks/01-Hello-World/*.cpp) \
-	$(wildcard Homeworks/01-Hello-World/*.txt) \
-	$(wildcard Homeworks/01-Hello-World/*.h) \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-02.pdf: \
-	Homeworks/02-Git/git.tex \
-	Homeworks/homeworktemplate.sty \
-	$(wildcard Homeworks/02-Git/**/*.cpp) \
-	$(wildcard Homeworks/02-Git/**/*.h) \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-03.pdf: \
-	Homeworks/03-TwoSum/two-sum.tex \
-	Homeworks/homeworktemplate.sty \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-04.pdf: \
-	Homeworks/04-Guessing-Game/guessing-game.tex \
-	Homeworks/homeworktemplate.sty \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-05.pdf: \
-	Homeworks/05-Hide-Secret/hide-secret.tex \
-	Homeworks/homeworktemplate.sty \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-06.pdf: \
-	Homeworks/06-LIFO-Stack/lifo-stack.tex \
-	Homeworks/homeworktemplate.sty \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-hw-07.pdf: \
-	Homeworks/07-Real48/real48.tex \
-	Homeworks/homeworktemplate.sty \
-	Packages/terminal.sty \
-	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
-
-prj-auth-lib.pdf: \
-	Projects/Identification-and-Authentication-Library/auth-library.tex \
-	$(wildcard Projects/images/*.jpg) \
-	Packages/mylisting.sty \
-	Projects/projectstemplate.sty
-	$(call generate_pdf,$<,$@)
-
-prj-enc-exch.pdf: \
-	Projects/Baremetal-exchange-encryption/exchange-encryption.tex \
-	$(wildcard Projects/images/*.jpg) \
-	Packages/mylisting.sty \
-	Projects/projectstemplate.sty
 	$(call generate_pdf,$<,$@)
