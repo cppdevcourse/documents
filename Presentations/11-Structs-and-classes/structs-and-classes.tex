@@ -1,6 +1,6 @@
 % !TeX TS-program = lualatex
 
-\documentclass[compress, 8pt]{beamer}
+\documentclass[compress, 8pt, aspectratio=169]{beamer}
 
 \usepackage{presentationtemplate}
 \usepackage[askip=3mm, bskip=3mm]{terminal}
@@ -665,7 +665,6 @@ public:
 private:
     const double real_, imaginary_;
 };
-
 ComplexNumber::ComplexNumber(
     const double real, const double imaginary) :
     real_(real), imaginary_(imaginary)
