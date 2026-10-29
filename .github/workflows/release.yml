@@ -24,20 +24,6 @@ jobs:
           filename: 'presentations.zip'
           directory: 'presentations/'
 
-      - name: Archive homeworks
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'homeworks.zip'
-          directory: 'homeworks/'
-
-      - name: Archive projects
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'projects.zip'
-          directory: 'projects/'
-
       - name: Upload PDFs to GitHub Release
         uses: ncipollo/release-action@v1.12.0
         with:
