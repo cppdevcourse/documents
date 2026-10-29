@@ -45,41 +45,66 @@
 
     \frametitle{Спецификаторы наследования}
 
-    По умолчанию наследование \texttt{public} у \texttt{struct}
-    и \texttt{private} у \texttt{class}. Спецификатор можно указать явно.
+    \begin{columns}[T]
+
+      \begin{column}{0.38\textwidth}
+
+        По-умолчанию у \texttt{struct} наследование \texttt{public}, a
+        у \texttt{class} \textemdash \space \texttt{private}.
+        Спецификатор можно указать явно.
+
+      \end{column}
+
+      \begin{column}{0.58\textwidth}
+
+      \begin{tabular}{lll}
+        \hline
+        Поле
+          & \texttt{D1}, \texttt{D2}, \texttt{D3}
+          & \texttt{D4} \\
+        \hline
+        \texttt{a} & \texttt{public} & \texttt{private} \\
+        \texttt{b} & \texttt{protected} & \texttt{private} \\
+        \texttt{c} & недоступно & недоступно \\
+        \hline
+      \end{tabular}
+
+      \end{column}
+
+    \end{columns}
 
     \myinputlisting[minted language=cpp]
         {Presentations/12-Inheritance/}
         {access-specs.cpp}
 
-    \vspace{1em}
-
-    \begin{center}
-      \begin{tabular}{lll}
-        \hline
-        Член \texttt{Base}
-          & \texttt{D1}, \texttt{D2}, \texttt{D4} (\texttt{public})
-          & \texttt{D3} (\texttt{private}) \\
-        \hline
-        \texttt{public} & \texttt{public} & \texttt{private} \\
-        \texttt{protected} & \texttt{protected} & \texttt{private} \\
-        \texttt{private} & недоступен & недоступен \\
-        \hline
-      \end{tabular}
-    \end{center}
-
   \end{frame}
 
   \begin{frame}[fragile]
 
-    \frametitle{\texttt{protected}-члены}
+    \frametitle{\texttt{protected}-поля}
 
-    \texttt{protected}-члены доступны методам производного класса,
+    \texttt{protected}-поля доступны методам производного класса,
     но недоступны из любого другого кода.
 
-    \myinputlisting[minted language=cpp, minted options app={fontsize=\scriptsize}]
-        {Presentations/12-Inheritance/}
-        {protected.cpp}
+    \begin{columns}[T]
+
+      \begin{column}{0.48\textwidth}
+
+        \myinputlisting[minted language=cpp, minted options app={fontsize=\small}]
+            {Presentations/12-Inheritance/}
+            {protected.hpp}
+
+      \end{column}
+
+      \begin{column}{0.48\textwidth}
+
+        \myinputlisting[minted language=cpp, minted options app={fontsize=\small}]
+            {Presentations/12-Inheritance/}
+            {protected.cpp}
+
+      \end{column}
+
+    \end{columns}
 
     \begin{terminalwindow}
 !\shellcommand{./a.out}!
@@ -123,7 +148,7 @@ a = 1, b = 2
 
   \begin{frame}[fragile]
 
-    \frametitle{Задача: какой конструктор базового класса будет вызван}
+    \frametitle{Конструкторы базового класса}
 
     \begin{task}
       Подумайте, что выведет программа. Почему?
@@ -195,7 +220,7 @@ Derived
 
   \begin{frame}[fragile]
 
-    \frametitle{Указатель на базовый класс и расположение объекта}
+    \frametitle{Указатель на базовый класс}
 
     Базовый под-объект размещён в начале объекта производного класса:
     адрес объекта и адрес его базовой части совпадают. Поэтому
@@ -231,14 +256,8 @@ Derived
 
     \frametitle{Скрытие метода}
 
-    \begin{itemize}
-      \item Метод производного класса с тем же именем не переопределяет,
-        а \textbf{скрывает} метод базового класса.
-      \item Без \texttt{virtual} вызывается метод, соответствующий
-        \textbf{статическому} типу выражения. Как сделать, чтобы
-        вызывался метод динамического типа, \textemdash \space
-        в следующей лекции.
-    \end{itemize}
+    Метод производного класса с тем же именем не переопределяет,
+    а \textbf{скрывает} метод базового класса.
 
     \myinputlisting[minted language=cpp]
         {Presentations/12-Inheritance/}
@@ -253,13 +272,9 @@ Derived
     \begin{itemize}
       \item Заявление \texttt{using Base::Foo;} вводит в область видимости
         производного класса все перегрузки базового класса.
-      \item Без него объявленный в производном классе метод скрывает
-        ВСЕ базовые перегрузки: \texttt{d.Foo(1)} молча вызовет
-        \texttt{Foo(double)}, а \texttt{d.Foo()} \textemdash \space
-        ошибка компиляции.
     \end{itemize}
 
-    \myinputlisting[minted language=cpp, minted options app={fontsize=\scriptsize}]
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\small}]
         {Presentations/12-Inheritance/}
         {using-base.cpp}
 

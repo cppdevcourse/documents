@@ -7,6 +7,9 @@
 \usepackage[export]{adjustbox}
 \usepackage{fontspec}
 
+\RequirePackage{tikz}
+\usetikzlibrary{positioning}
+
 % fonts
 \setsansfont[
     Path=Fonts/dejavu-sans/,
@@ -39,7 +42,7 @@
 % add logos on regular slides
 \logo{
     \begin{tikzpicture}[overlay,remember picture]
-        \node[left=0.2cm] at (current page.32){
+        \node[below left=0.2cm and 0.2cm] at (current page.north east){
             \includegraphics[scale=0.15,valign=t]{Presentations/images/prosoft-logo.png}
         };
     \end{tikzpicture}
@@ -55,4 +58,3 @@
     ООО~"Прософт-Системы"
 }
 \date{\the\year{}}
-

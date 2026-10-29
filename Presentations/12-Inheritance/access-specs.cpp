@@ -6,7 +6,7 @@ private:
     int c;
 };
 
-struct D1 : public Base {};  // public
-struct D2 : Base {};         // struct: public
-class D3 : Base {};          // class: private
-class D4 : public Base {};
+struct D1 : public Base {};
+struct D2 : Base {};
+class D3 : public Base {};
+class D4 : Base {};
