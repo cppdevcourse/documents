@@ -1,5 +1,5 @@
 ---
-description: Разработчик документов LaTeX (beamer, LuaTeX). Переводит черновики презентаций (build/drafts/*.md) в исходники .tex, подключает к Makefile, собирает и устраняет ошибки; проверяет, что код помещается на слайды 4:3. Используйте, когда текст презентации готов и нужно создать/обновить .tex и pdf.
+description: Разработчик документов LaTeX (beamer, LuaTeX). Переводит черновики презентаций (build/drafts/*.md) в исходники .tex, подключает к Makefile, собирает и устраняет ошибки; проверяет, что код помещается на слайды 16:9. Используйте, когда текст презентации готов и нужно создать/обновить .tex и pdf.
 mode: subagent
 permissions:
   - action: shell
@@ -32,11 +32,12 @@ cppdevcourse-documents. Вы переводите готовые тексты п
    заданы в шаблоне — не объявляйте их повторно.
 3. Создайте презентацию:
    - директория `Presentations/<NN-topic>/`, основной файл `<topic>.tex`:
-     `\documentclass[compress]{beamer}`, `\usepackage{presentationtemplate}`,
+     `\documentclass[compress, 8pt, aspectratio=169]{beamer}`,
+     `\usepackage{presentationtemplate}`,
      `\usepackage{terminal}` и `\usepackage{mylisting}` — только если есть
      примеры, `\subtitle{...}`, затем фреймы;
-   - слайды — 4:3 (128×96мм), это значение beamer по умолчанию; опцию
-     `aspectratio` нигде не указывать;
+   - слайды — 16:9 (160×90мм): `aspectratio=169` указывается в
+     `\documentclass` каждого `.tex`;
    - каждый слайд черновика — фрейм; фреймы с кодом — `[fragile]`;
    - код на C++ в отдельных файлах `.cpp`/`.h` в той же директории
      (скопируйте из `build/drafts/<NN-topic>/`, если файлы там); вставка
@@ -52,7 +53,7 @@ cppdevcourse-documents. Вы переводите готовые тексты п
 5. Соберите: `nix develop --command make pr-NN`. Читайте лог
    `build/pr-NN.log` и устраняйте ошибки (LaTeX, Makefile, пути)
    до успешной сборки.
-6. Проверьте, что всё помещается на слайды (4:3):
+6. Проверьте, что всё помещается на слайды (16:9):
    - `grep -n "Overfull" build/pr-NN.log` — вертикальный перелив
      (`Overfull \vbox`); горизонтальный перенос строк листинга в лог
      НЕ попадает (minted молча переносит) — проверяйте отдельно;
@@ -60,7 +61,7 @@ cppdevcourse-documents. Вы переводите готовые тексты п
      перенесённая строка кода отобразится как две физические строки;
    - при сомнениях: `pdftoppm -png -r 60 build/pr-NN.pdf
      /tmp/opencode/page` и посмотрите на изображения;
-   - `pdfinfo build/pr-NN.pdf` — число страниц и размер (128×96мм).
+   - `pdfinfo build/pr-NN.pdf` — число страниц и размер (160×90мм).
    Если листинг не вписывается: разбейте его на два слайда, уменьшите
    размер шрифта (`fontsize=\scriptsize` в опциях пакета `mylisting`
    или в ключе `\myinputlisting`) либо передайте изменение **pm**

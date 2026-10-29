@@ -38,11 +38,11 @@ Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in six places: the
 ## Presentation conventions
 
 - Directory `Presentations/NN-topic/`: NN — next number in the series (current max + 1), topic — kebab-case (e.g. `16-constexpr`). Main file — `topic.tex`; exemplar: `Presentations/01-Intro/intro.tex`.
-- Slides are 4:3 (128×96mm) — beamer's default; the `aspectratio` option is not set anywhere (no `aspectratio=169`).
-- Skeleton: `\documentclass[compress]{beamer}` + `\usepackage{presentationtemplate}` + `\usepackage{terminal}` / `\usepackage{mylisting}` (only when there are examples) + `\subtitle{...}`. Fonts, logos, author and date come from the template — do not redeclare them.
+- Slides are 16:9 (160×90mm); `aspectratio=169` is set in each `.tex`'s `\documentclass` along with `compress` and the font size (01 — default 11pt, 02 — 10pt, 03–15 — 8pt).
+- Skeleton: `\documentclass[compress, 8pt, aspectratio=169]{beamer}` + `\usepackage{presentationtemplate}` + `\usepackage{terminal}` / `\usepackage{mylisting}` (only when there are examples) + `\subtitle{...}`. Fonts, logos, author and date come from the template — do not redeclare them.
 - Code examples — `.cpp`/`.h` files in the presentation directory; inserted with `\myinputlisting[minted language=cpp]{Presentations/NN-topic/}{file}` (path relative to the project root), short fragments — `\myinplacelisting` / `mycppinplacelisting`, program runs — `terminalwindow` with `\shellcommand{...}`. Frames with code get `[fragile]`.
 - The course standard is C++23; every example must compile with `g++ -std=c++23 -Wall -Wextra`. `cpp-expert` compiles and verifies each example before handing the draft over (see "Roles and pipeline (subagents)").
-- Listing limits (measured for 4:3, `\footnotesize` with line numbers): no more than 54 characters per line (full-width listing), no more than 25 (a `0.48\textwidth` column), no more than 19 lines per frame (single listing; less when the slide also carries text). Beyond that — split the slide or reduce the font size. Fit check: `grep -n "Overfull" build/pr-NN.log` (vertical overflow only — a horizontal line wrap is not logged) + `pdftotext -layout` / `pdftoppm -png -r 60` (poppler-utils is in the devshell).
+- Listing limits (measured for 16:9, 8pt, `\footnotesize` with line numbers): no more than 81 characters per line (full-width listing), no more than 38 (a `0.48\textwidth` column), no more than 24 lines per frame (single listing; less when the slide also carries text). Beyond that — split the slide or reduce the font size. Fit check: `grep -n "Overfull" build/pr-NN.log` (vertical overflow only — a horizontal line wrap is not logged) + `pdftotext -layout` / `pdftoppm -png -r 60` (poppler-utils is in the devshell).
 - Drafts live in `build/drafts/` (gitignored): plan — `build/drafts/NN-topic.plan.md`, text — `build/drafts/NN-topic.md`, example code — `build/drafts/NN-topic/`.
 
 ## Roles and pipeline (subagents)
@@ -52,7 +52,7 @@ Work on presentations is split between three subagents (configs in `.opencode/ag
 | Agent        | Role                                                                                                                                    | Restrictions                                                        |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `cpp-expert` | C++ expert: prepares the presentation plan (for approval) and, after approval, its full text; compiles and verifies every code example (`g++ -std=c++23 -Wall -Wextra`); at the typesetting stage (stage 3) decides whether proposed listing/text changes are acceptable | writes only drafts in `build/drafts/`; bash is for compiling code only |
-| `latex-dev`  | Document developer: turns the text into LaTeX, wires it into the Makefile, builds and fixes errors; checks that code fits the 4:3 slides                                        | edits files, runs `make`/`nix develop`, poppler utilities           |
+| `latex-dev`  | Document developer: turns the text into LaTeX, wires it into the Makefile, builds and fixes errors; checks that code fits the 16:9 slides                                       | edits files, runs `make`/`nix develop`, poppler utilities           |
 | `pm`         | Project manager: runs the pipeline, approves the plan with the user, coordinates listing/text changes between latex-dev and cpp-expert, verifies the result                          | does not edit files; stages and runs `nix build`, checks `result/`  |
 
 Pipeline:

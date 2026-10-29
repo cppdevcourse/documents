@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstdint>
-
 int main() {
     const std::uint64_t x {};
     const std::uint64_t* const p { &x };
