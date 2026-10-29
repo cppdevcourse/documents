@@ -1,0 +1,268 @@
+\documentclass[compress, 8pt]{beamer}
+
+\usepackage{presentationtemplate}
+\usepackage[askip=3mm, bskip=3mm]{terminal}
+\usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
+\tcbuselibrary{hooks}
+
+\newtcolorbox{task}{
+    colback=yellow!50!white,
+    boxrule=0.02cm,
+    colframe=black,
+    sharp corners,
+    left=0mm,
+    right=0mm,
+    top=0mm,
+    bottom=0mm,
+    before upper={\textbf{Задание}:\:},
+}
+
+\title{Наследование}
+
+\begin{document}
+
+  \frame[plain]{\titlepage}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Наследование: синтаксис}
+
+    \begin{itemize}
+      \item Класс, образованный из другого класса, называется
+        \textbf{производным} (derived); исходный \textemdash \space
+        \textbf{базовым} (base).
+      \item Синтаксис: \texttt{struct Derived : Base \{\};} \textemdash \space
+        поля базового класса доступны производному через точку.
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {syntax.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Спецификаторы наследования}
+
+    По умолчанию наследование \texttt{public} у \texttt{struct}
+    и \texttt{private} у \texttt{class}. Спецификатор можно указать явно.
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {access-specs.cpp}
+
+    \vspace{1em}
+
+    \begin{center}
+      \begin{tabular}{lll}
+        \hline
+        Член \texttt{Base}
+          & \texttt{D1}, \texttt{D2}, \texttt{D4} (\texttt{public})
+          & \texttt{D3} (\texttt{private}) \\
+        \hline
+        \texttt{public} & \texttt{public} & \texttt{private} \\
+        \texttt{protected} & \texttt{protected} & \texttt{private} \\
+        \texttt{private} & недоступен & недоступен \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{protected}-члены}
+
+    \texttt{protected}-члены доступны методам производного класса,
+    но недоступны из любого другого кода.
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\scriptsize}]
+        {Presentations/12-Inheritance/}
+        {protected.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{./a.out}!
+a = 1, b = 2
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Задача: найдите ошибку}
+
+    \begin{task}
+      Найдите ошибку в коде ниже.
+    \end{task}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {task2.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Конструкторы базового класса}
+
+    \begin{itemize}
+      \item Конструкторы базового класса НЕ наследуются: вызова
+        \texttt{Derived(1)}, который напрямую вызвал бы
+        \texttt{Base(int)}, не существует.
+      \item Конструктор базового класса вызывается явно
+        \textemdash \space в инициализаторном списке конструктора
+        производного класса.
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {base-ctors.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Задача: какой конструктор базового класса будет вызван}
+
+    \begin{task}
+      Подумайте, что выведет программа. Почему?
+    \end{task}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {task3.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Порядок вызова конструкторов и деструкторов}
+
+    Конструкторы: сначала базовый, потом производный. Деструкторы
+    \textemdash \space в обратном порядке: сначала производный,
+    потом базовый.
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {ctor-order.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Порядок вызова конструкторов и деструкторов}
+
+    Вывод программы с прошлого слайда:
+
+    \begin{terminalwindow}
+!\shellcommand{./a.out}!
+Base
+Derived
+~Derived
+~Base
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Задача: порядок вызовов}
+
+    \begin{task}
+      Подумайте, что выведет программа. Обоснуйте ответ.
+    \end{task}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {task1.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Object slicing}
+
+    При копировании, присваивании или передаче объекта производного
+    класса по значению копируется только под-объект базовой части.
+    Это называется \textbf{обрезание объекта} (object slicing).
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {slicing.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Указатель на базовый класс и расположение объекта}
+
+    Базовый под-объект размещён в начале объекта производного класса:
+    адрес объекта и адрес его базовой части совпадают. Поэтому
+    указатель на базовый класс может указывать на производный объект.
+
+    \begin{columns}[T]
+
+      \begin{column}{0.48\textwidth}
+
+        \myinputlisting[minted language=cpp]
+            {Presentations/12-Inheritance/}
+            {layout.cpp}
+
+      \end{column}
+
+      \begin{column}{0.48\textwidth}
+
+        \begin{terminalwindow}
+!\shellcommand{g++ layout.cpp}!
+!\shellcommand{./a.out}!
+0x7ffc0ef376e8
+0x7ffc0ef376e8
+0x7ffc0ef376ec
+        \end{terminalwindow}
+
+      \end{column}
+
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Скрытие метода}
+
+    \begin{itemize}
+      \item Метод производного класса с тем же именем не переопределяет,
+        а \textbf{скрывает} метод базового класса.
+      \item Без \texttt{virtual} вызывается метод, соответствующий
+        \textbf{статическому} типу выражения. Как сделать, чтобы
+        вызывался метод динамического типа, \textemdash \space
+        в следующей лекции.
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/12-Inheritance/}
+        {hiding.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{using Base::}}
+
+    \begin{itemize}
+      \item Заявление \texttt{using Base::Foo;} вводит в область видимости
+        производного класса все перегрузки базового класса.
+      \item Без него объявленный в производном классе метод скрывает
+        ВСЕ базовые перегрузки: \texttt{d.Foo(1)} молча вызовет
+        \texttt{Foo(double)}, а \texttt{d.Foo()} \textemdash \space
+        ошибка компиляции.
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\scriptsize}]
+        {Presentations/12-Inheritance/}
+        {using-base.cpp}
+
+  \end{frame}
+
+\end{document}

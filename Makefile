@@ -29,6 +29,7 @@ BUILD_DIR := build
 	pr-13 \
 	pr-14 \
 	pr-15 \
+	pr-16 \
 	prj-auth-lib \
 	prj-enc-exch
 
@@ -57,6 +58,7 @@ build: \
 	pr-13 \
 	pr-14 \
 	pr-15 \
+	pr-16 \
 	prj-auth-lib \
 	prj-enc-exch
 
@@ -73,10 +75,11 @@ install: build
 	cp "$(BUILD_DIR)/pr-09.pdf" "$(PREFIX)/presentations/09-functions.pdf"
 	cp "$(BUILD_DIR)/pr-10.pdf" "$(PREFIX)/presentations/10-type-conversions.pdf"
 	cp "$(BUILD_DIR)/pr-11.pdf" "$(PREFIX)/presentations/11-structures-and-classes.pdf"
-	cp "$(BUILD_DIR)/pr-12.pdf" "$(PREFIX)/presentations/12-exceptions.pdf"
-	cp "$(BUILD_DIR)/pr-13.pdf" "$(PREFIX)/presentations/13-dynamic-dispatch.pdf"
-	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-templates.pdf"
-	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-standard-library.pdf"
+	cp "$(BUILD_DIR)/pr-12.pdf" "$(PREFIX)/presentations/12-inheritance.pdf"
+	cp "$(BUILD_DIR)/pr-13.pdf" "$(PREFIX)/presentations/13-exceptions.pdf"
+	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-dynamic-dispatch.pdf"
+	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-templates.pdf"
+	cp "$(BUILD_DIR)/pr-16.pdf" "$(PREFIX)/presentations/16-standard-library.pdf"
 	mkdir -p "$(PREFIX)/homeworks"
 	cp "$(BUILD_DIR)/hw-01.pdf" "$(PREFIX)/homeworks/01-hello-world.pdf"
 	cp "$(BUILD_DIR)/hw-02.pdf" "$(PREFIX)/homeworks/02-git-github.pdf"
@@ -120,6 +123,7 @@ help:
 	@printf "pr-13\tbuild presentation pr-13.pdf\n"
 	@printf "pr-14\tbuild presentation pr-14.pdf\n"
 	@printf "pr-15\tbuild presentation pr-15.pdf\n"
+	@printf "pr-16\tbuild presentation pr-16.pdf\n"
 	@printf "prj-auth-lib\tbuild project prj-auth-lib.pdf\n"
 	@printf "prj-enc-exch\tbuild project prj-enc-exch.pdf\n"
 
@@ -138,6 +142,7 @@ pr-12: pr-12.pdf
 pr-13: pr-13.pdf
 pr-14: pr-14.pdf
 pr-15: pr-15.pdf
+pr-16: pr-16.pdf
 
 hw-01: hw-01.pdf
 hw-02: hw-02.pdf
@@ -284,28 +289,38 @@ pr-11.pdf: \
 	$(call generate_pdf,$<,$@)
 
 pr-12.pdf: \
-	Presentations/12-Exceptions/exceptions.tex \
+	Presentations/12-Inheritance/inheritance.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	$(wildcard Presentations/12-Inheritance/*.cpp) \
+	$(wildcard Presentations/12-Inheritance/*.h) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
 	$(call generate_pdf,$<,$@)
 
 pr-13.pdf: \
-	Presentations/13-Virtual-members/virtual-members.tex \
+	Presentations/13-Exceptions/exceptions.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
 	Packages/mylisting.sty
 	$(call generate_pdf,$<,$@)
 
 pr-14.pdf: \
-	Presentations/14-Templates/templates.tex \
+	Presentations/14-Virtual-members/virtual-members.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
 	Packages/mylisting.sty
 	$(call generate_pdf,$<,$@)
 
 pr-15.pdf: \
-	Presentations/15-Stdlib/stdlib.tex \
+	Presentations/15-Templates/templates.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	Packages/mylisting.sty
+	$(call generate_pdf,$<,$@)
+
+pr-16.pdf: \
+	Presentations/16-Stdlib/stdlib.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
 	Packages/mylisting.sty
