@@ -4,59 +4,60 @@
     self.submodules = true;
   };
 
-  outputs = { self, nixpkgs, ... }: let
+  outputs = { self, nixpkgs, ... }:
+    let
 
-    system = "x86_64-linux";
+      system = "x86_64-linux";
 
-    pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = nixpkgs.legacyPackages.${system};
 
-    buildInputs = with pkgs; [
-      texliveFull
-      gnumake
-      zip
-    ];
+      buildInputs = with pkgs; [
+        texliveFull
+        gnumake
+        zip
+      ];
 
-  in
-  {
-    packages.${system}.default = pkgs.stdenvNoCC.mkDerivation {
+    in
+    {
+      packages.${system}.default = pkgs.stdenvNoCC.mkDerivation {
 
-      name = "cppdevcourse-documents";
+        name = "cppdevcourse-documents";
 
-      src = ./.;
+        src = ./.;
 
-      nativeBuildInputs = buildInputs;
+        nativeBuildInputs = buildInputs;
 
-      preBuild = ''
-        export HOME=$TMPDIR
-        export TEXMFVAR=$TMPDIR/texmf-var
-        export TEXMFCACHE=$TMPDIR/texmf-cache
-        luaotfload-tool --update --force
-      '';
+        preBuild = ''
+          export HOME=$TMPDIR
+          export TEXMFVAR=$TMPDIR/texmf-var
+          export TEXMFCACHE=$TMPDIR/texmf-cache
+          luaotfload-tool --update --force
+        '';
 
-      buildPhase = ''
-        runHook preBuild
-        make clean
-        make -j"$NIX_BUILD_CORES"
-        runHook postBuild
-      '';
+        buildPhase = ''
+          runHook preBuild
+          make clean
+          make -j"$NIX_BUILD_CORES"
+          runHook postBuild
+        '';
 
-      installPhase = ''
-        runHook preInstall
-        mkdir -p "$out"
-        make install PREFIX="$out"
-        runHook postInstall
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out"
+          make install PREFIX="$out"
+          runHook postInstall
+        '';
+
+      };
+
+      devShells.${system}.default = pkgs.mkShellNoCC {
+        packages = buildInputs ++ [ pkgs.gcc pkgs.poppler-utils ];
+      };
+
+      checks.${system}.fmt = pkgs.runCommand "check-fmt" { } ''
+        ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${toString self}
+        mkdir -p $out
       '';
 
     };
-
-    devShells.${system}.default = pkgs.mkShellNoCC {
-      packages = buildInputs;
-    };
-
-    checks.${system}.fmt = pkgs.runCommand "check-fmt" { } ''
-      ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${toString self}
-      mkdir -p $out
-    '';
-
-  };
 }
