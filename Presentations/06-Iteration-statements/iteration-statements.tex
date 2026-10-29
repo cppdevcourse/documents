@@ -1,6 +1,6 @@
 % !TeX TS-program = xelatex
 
-\documentclass[compress, 8pt]{beamer}
+\documentclass[compress, 8pt, aspectratio=169]{beamer}
 
 \usepackage{presentationtemplate}
 \usepackage[askip=3mm, bskip=3mm]{terminal}
@@ -212,7 +212,17 @@ int main() {
     Тело цикла \verb|while| будет выполняться до тех пор, пока истинно
     условие в круглых скобках после \verb|while|.
 
-    \begin{myinplacelisting}[minted language=cpp]
+    \begin{myinplacelisting}[%
+        minted language=cpp,
+        minted options={
+            fontsize=\footnotesize,
+            breaklines,
+            breakanywhere,
+            linenos,
+            escapeinside=||,
+            numbersep=2pt
+        },
+    ]
 #include <iostream>
 
 bool do_continue();
@@ -309,7 +319,7 @@ int main() {
     \begin{myinplacelisting}[%
         minted language=cpp,
         minted options={
-            fontsize=\normalsize,
+            fontsize=\footnotesize,
             breaklines,
             breakanywhere,
             linenos,
@@ -319,7 +329,6 @@ int main() {
     ]
 #include <iostream>
 #include <cstdint>
-
 #define MAX_X 11
 
 bool do_continue();
