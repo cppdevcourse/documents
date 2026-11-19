@@ -130,9 +130,8 @@ description: Рецепт добавления новой презентации
     перенесённая строка кода отобразится как две физические строки;
   - `pdftoppm -png -r 60 build/pr-NN.pdf /tmp/opencode/page` — визуально;
   - `pdfinfo build/pr-NN.pdf` — число страниц и размер (160×90мм).
-  Утилиты poppler есть в devshell; вне devshell —
-  `nix shell nixpkgs#poppler-utils --command pdftotext ...`
-  (`nix run ... --command` не работает: unrecognised flag).
+  Утилиты poppler есть в devshell; все команды запускайте
+  только через `nix develop --command`.
 - Финальная проверка: `nix build` → убедиться, что
   `result/presentations/<NN-topic>.pdf` существует и не пуст.
   Перед ней — `git add Presentations/<NN-topic>/`: flake копирует в

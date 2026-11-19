@@ -4,7 +4,8 @@ LaTeX sources for the Russian-language course "Введение в разраб�
 
 ## Build
 
-- Toolchain comes from Nix via Flakes (`flake.nix` + committed `flake.lock`, nixpkgs pinned in `inputs`): `nix develop` opens a shell with texliveFull, gnumake and zip; `nix build` compiles every document via the Makefile's `install` target into a `result/` tree (`presentations/`, `homeworks/`, `projects/`). Host LaTeX tools may be missing or mismatched — always build inside Nix. `nix flake check` runs a `nixpkgs-fmt` formatting check on the flake.
+- Toolchain comes from Nix via Flakes (`flake.nix` + committed `flake.lock`, nixpkgs pinned in `inputs`): `nix develop` opens a shell with texliveFull, gnumake, zip, gcc and poppler-utils (coreutils, grep, findutils and sed come in as dependencies); `nix build` compiles every document via the Makefile's `install` target into a `result/` tree (`presentations/`, `homeworks/`, `projects/`). Host tools may be missing or mismatched — never rely on the host toolchain. `nix flake check` runs a `nixpkgs-fmt` formatting check on the flake.
+- Subagents run all their commands inside the devShell: `nix develop --command <cmd>` (cpp-expert — g++, grep, coreutils; latex-dev — make, lualatex, poppler-utils).
 - For a single doc inside the dev shell: `make pr-01`, `make hw-07`, `make prj-auth-lib` (list via `make help`). In `nix build` output lands in `result/` (a gitignored symlink into the nix store); with plain `make` it lands in `build/` (also gitignored) — so stale PDFs are easy to miss.
 - The homework starter repos (`Homeworks/NN-*/hw-project`, `Homeworks/07-Real48/submodule`) are git submodules pulled into the flake source via `self.submodules = true`, so `nix build` is hermetic without a local `git submodule update`. To bump one, update the submodule and commit the new gitlink — there are no flake input pins to keep in sync.
 - The default branch is `master`; GitHub Actions only run on push/PR to `master`. CI runs `nix build` on that branch (see `.github/workflows/compile.yml`); the Release workflow (`.github/workflows/release.yml`) reuses it to publish per-category zips on releases.
@@ -105,6 +106,8 @@ is controlled by the `skill` permission action only.
 * `skill: deny` — cannot load typesetting/build skills (information
   barrier); listing limits live in its own config instead.
 * Writes only `build/drafts/**`.
+* Runs all commands only inside the devShell
+  (`nix develop --command <cmd>`).
 
 ### 3. latex-dev — LaTeX document developer
 
@@ -115,6 +118,8 @@ is controlled by the `skill` permission action only.
   not interpret text meaning; structural listing changes always go
   through pm → cpp-expert (stage 3).
 * No access to harness files.
+* Runs all commands only inside the devShell
+  (`nix develop --command <cmd>`).
 
 ### Pipeline
 
