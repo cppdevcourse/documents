@@ -69,7 +69,7 @@ is controlled by the `skill` permission action only.
 
 | Agent        | Access                                                                                                                                              |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pm`         | `subagent`, `question`, `shell` (except `git commit*`/`git push*`/`git reset*`); documents are read-only; edit: `.opencode/*`, `AGENTS.md`, `opencode.json` (harness owner) |
+| `pm`         | `subagent`, `question`, `shell` (except `git commit*`/`git push*`/`git reset*`); edit: all files (harness owner); document files — only on explicit user instruction, outside the pipeline |
 | `cpp-expert` | `shell` (except git denies), `websearch`, `webfetch` (fact checking); edit: `build/drafts/**` only; `skill` denied (information barrier from typesetting conventions)                   |
 | `latex-dev`  | `shell` (except git denies); edit: all project files except `.opencode/*`, `opencode.json`, `AGENTS.md`                                                                                    |
 
@@ -87,9 +87,10 @@ is controlled by the `skill` permission action only.
   does not trust a report on faith; rejects reports missing the
   `Skills loaded:` line or the required skill.
 * Does not do the specialists' work (no LaTeX debugging, no C++
-  content); the exception is the harness: pm edits `.opencode/*`,
-  `AGENTS.md`, `opencode.json` (conventions — the `edit-skill`
-  skill), on explicit user commission.
+  content); the exceptions are the harness (pm edits `.opencode/*`,
+  `AGENTS.md`, `opencode.json` per the `edit-skill` conventions,
+  on explicit user commission) and point edits to document files
+  on the user's direct instruction (verified by `nix build`).
 * Approves the plan with the user via the `question` tool.
 
 ### 2. cpp-expert — C++ content expert
@@ -165,7 +166,10 @@ git-tracked files" in "Build"); nobody commits.
 
 The harness (`.opencode/`, `AGENTS.md`, `opencode.json`) is owned by
 pm: subagents have `edit: deny` on these files, and pm edits the
-harness following the `edit-skill` conventions.
+harness following the `edit-skill` conventions. pm has
+`edit: allow` on all files, but document-file edits outside the
+pipeline are made only on explicit user instruction and are
+verified by `nix build`.
 
 Subagent config requirements (`.opencode/agent/*.md`, native V2
 frontmatter): the `permissions` list uses the V2 action names —
