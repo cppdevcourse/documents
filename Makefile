@@ -22,7 +22,9 @@ BUILD_DIR := build
 	pr-13 \
 	pr-14 \
 	pr-15 \
-	pr-16
+	pr-16 \
+	pr-17 \
+	pr-19
 
 all: build
 
@@ -42,7 +44,9 @@ build: \
 	pr-13 \
 	pr-14 \
 	pr-15 \
-	pr-16
+	pr-16 \
+	pr-17 \
+	pr-19
 
 install: build
 	mkdir -p "$(PREFIX)/presentations"
@@ -62,6 +66,8 @@ install: build
 	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-dynamic-dispatch.pdf"
 	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-templates.pdf"
 	cp "$(BUILD_DIR)/pr-16.pdf" "$(PREFIX)/presentations/16-standard-library.pdf"
+	cp "$(BUILD_DIR)/pr-17.pdf" "$(PREFIX)/presentations/17-streams.pdf"
+	cp "$(BUILD_DIR)/pr-19.pdf" "$(PREFIX)/presentations/19-algorithms.pdf"
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -88,6 +94,8 @@ help:
 	@printf "pr-14\tbuild presentation pr-14.pdf\n"
 	@printf "pr-15\tbuild presentation pr-15.pdf\n"
 	@printf "pr-16\tbuild presentation pr-16.pdf\n"
+	@printf "pr-17\tbuild presentation pr-17.pdf\n"
+	@printf "pr-19\tbuild presentation pr-19.pdf\n"
 
 pr-01: pr-01.pdf
 pr-02: pr-02.pdf
@@ -105,6 +113,8 @@ pr-13: pr-13.pdf
 pr-14: pr-14.pdf
 pr-15: pr-15.pdf
 pr-16: pr-16.pdf
+pr-17: pr-17.pdf
+pr-19: pr-19.pdf
 
 # Кодовые файлы листингов (minted) — рекурсивно до 3 уровней вложенности;
 # GNU make не поддерживает рекурсивные wildcard, поэтому уровни расписаны явно.
@@ -286,3 +296,21 @@ pr-16.pdf: \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
 	$(call generate_pdf,Presentations/16-Stdlib/stdlib.tex)
+
+pr-17.pdf: \
+	Presentations/17-streams/streams.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,17-streams) \
+	Packages/terminal.sty \
+	Packages/mylisting.sty
+	$(call generate_pdf,Presentations/17-streams/streams.tex)
+
+pr-19.pdf: \
+	Presentations/19-algorithms/algorithms.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,19-algorithms) \
+	Packages/terminal.sty \
+	Packages/mylisting.sty
+	$(call generate_pdf,Presentations/19-algorithms/algorithms.tex)

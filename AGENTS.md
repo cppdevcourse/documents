@@ -47,12 +47,17 @@ Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in six places: the
 ## Presentation conventions
 
 - Directory `Presentations/NN-topic/`: NN — next number in the series (current max + 1), topic — kebab-case (e.g. `16-constexpr`). Main file — `topic.tex`; exemplar: `Presentations/01-Intro/intro.tex`.
-- Slides are 16:9 (160×90mm); `aspectratio=169` is set in each `.tex`'s `\documentclass` along with `compress` and the font size (01 — default 11pt, 02 — 10pt, 03–15 — 8pt).
-- Skeleton: `\documentclass[compress, 8pt, aspectratio=169]{beamer}` + `\usepackage{presentationtemplate}` + `\usepackage{terminal}` / `\usepackage{mylisting}` (only when there are examples) + `\subtitle{...}`. Fonts, logos, author and date come from the template — do not redeclare them.
+- Slides are 16:9 (160×90mm); `aspectratio=169` is set in each `.tex`'s `\documentclass` along with `compress` and the font size (01 — default 11pt, 02 — 10pt, 03–19 — 8pt).
+- Skeleton: `\documentclass[compress, 8pt, aspectratio=169]{beamer}` + `\usepackage{presentationtemplate}` + `\usepackage{terminal}` / `\usepackage{mylisting}` (only when there are examples). Fonts, logos, author, date and the subtitle come from the template — do not redeclare them.
+- `\subtitle` is never defined in a deck's .tex: the subtitle "Введение в разработку на C++" is set in `presentationtemplate.sty`.
 - Code examples — `.cpp`/`.h` files in the presentation directory; inserted with `\myinputlisting[minted language=cpp]{Presentations/NN-topic/}{file}` (path relative to the project root), short fragments — `\myinplacelisting` / `mycppinplacelisting`, program runs — `terminalwindow` with `\shellcommand{...}`. Frames with code get `[fragile]`.
 - The course standard is C++23; every example must compile with `g++ -std=c++23 -Wall -Wextra`. `cpp-expert` compiles and verifies each example before handing the draft over (see "Roles and pipeline (subagents)").
 - Listing limits (measured for 16:9, 8pt, `\footnotesize` with line numbers): no more than 81 characters per line (full-width listing), no more than 38 (a `0.48\textwidth` column), no more than 24 lines per frame (single listing; less when the slide also carries text). Beyond that — split the slide or reduce the font size. Fit check: `grep -n "Overfull" build/pr-NN.log` (vertical overflow only — a horizontal line wrap is not logged) + `pdftotext -layout` / `pdftoppm -png -r 60` (poppler-utils is in the devshell).
 - Drafts live in `build/drafts/` (gitignored): plan — `build/drafts/NN-topic.plan.md`, text — `build/drafts/NN-topic.md`, example code — `build/drafts/NN-topic/`.
+- Slide text is impersonal: no "personal" address to the audience ("вы передаёте", "мы напишем", "разбираем", "вызвали", "меняйте") — only impersonal formulations ("итераторы на данные передаются", "алгоритм можно разработать самостоятельно").
+- `\itemize`/`\item` — only for genuine multi-item lists; a single item goes into plain text without a marker.
+- A "Итоги" frame (a summary of the whole presentation) does not exist — it is never needed. A `task` box (homework) may be present but never as a "write code" assignment: students do not write code during lectures — allowed are tasks like finding an error in a listing, reasoning about the code, and proposing a fix.
+- Long dashes (—) are preferably avoided in slide text: rephrase instead of the dash (bad: "не нашёл — возвращает end"; good: "возвращает end, если не нашёл"). If a dash does remain, write `\textemdash \space` — a regular space after `\textemdash` is swallowed by lualatex (in the PDF it becomes "слово—слово"). A short dash (`\textendash`) is never used as a dash in slide text. The convention is in `Presentations/08-Arrays/arrays.tex`.
 
 ## Roles and pipeline (subagents)
 

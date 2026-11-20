@@ -1,0 +1,383 @@
+\documentclass[compress, 8pt, aspectratio=169]{beamer}
+
+\usepackage{presentationtemplate}
+\usepackage[askip=3mm, bskip=3mm]{terminal}
+\usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
+\tcbuselibrary{hooks}
+\usepackage{tcolorbox}
+\usepackage{csquotes}
+\usepackage{tabularray}
+
+\newtcolorbox{task}{
+    colback=yellow!50!white,
+    boxrule=0.02cm,
+    colframe=black,
+    sharp corners,
+    left=0mm,
+    right=0mm,
+    top=0mm,
+    bottom=0mm,
+    before upper={\textbf{Задание}:\:},
+}
+
+\title{Стандартная библиотека: алгоритмы}
+
+\begin{document}
+
+  \frame[plain]{\titlepage}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Алгоритмы из STL}
+
+    \begin{itemize}
+
+      \item \textbf{Алгоритм}: шаблонная функция
+        из заголовочного файла \texttt{<algorithm>}.
+      \item Не хранит данные: итераторы на данные
+        передаются аргументами.
+      \item Работает с любым контейнером:
+        \texttt{array}, \texttt{vector}, \texttt{list}, обычный массив.
+      \item Условие и преобразование передаются отдельным аргументом,
+        функцией (например, адресом именованной функции, замыканием
+        лямбда-функции и т.д.).
+
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Типичная сигнатура алгоритма}
+
+    Большинство алгоритмов принимают диапазон итераторов
+    \texttt{[first, last)} и возвращают итератор или значение:
+
+    \begin{myinplacelisting}[minted language=cpp]
+template <class InIt, class OutIt>
+OutIt copy(InIt first, InIt last, OutIt d_first);
+    \end{myinplacelisting}
+
+    \begin{itemize}
+
+      \item \texttt{first}, \texttt{last}: обрабатываемый диапазон;
+      \item \texttt{d\_first}: начало диапазона, куда пишется результат;
+      \item результат \textemdash \space итератор на элемент, следующий за
+        последним обработанным.
+
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Категории \texttt{<algorithm>}}
+
+    \begin{tblr}{
+      colspec = {|X[0.30,l]|X[0.26,l]|X[0.44,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Категория (cppreference) & Алгоритм & Что делает \\
+      Copy operations & \texttt{std::copy} & Копирует диапазон в другое место. \\
+      Transformation & \texttt{std::transform} & Применяет функцию к каждому элементу. \\
+      Generation & \texttt{std::fill} & Заполняет диапазон значением. \\
+      Removing & \texttt{std::remove} & \enquote{Логически убирает} значения из диапазона. \\
+      Order-changing & \texttt{std::reverse} & Переворачивает порядок элементов. \\
+      Search operations & \texttt{std::find} & Находит первый элемент, равный значению. \\
+      Sorting operations & \texttt{std::sort} & Сортирует диапазон. \\
+      Minimum/maximum operations & \texttt{std::max\_element} & Находит наибольший элемент, возвращает итератор. \\
+    \end{tblr}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::copy}}
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{copy.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 copy.cpp -o copy}!
+!\shellcommand{./copy}!
+1 2 3
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::copy}: что возвращается}
+
+    Возвращает итератор на элемент, следующий за последним
+    скопированным, его можно передать дальше:
+
+    \begin{myinplacelisting}[minted language=cpp]
+auto last = std::copy(src.begin(), src.end(),
+                      dst.begin());
+// last == dst.end()
+    \end{myinplacelisting}
+
+    \begin{task}
+      Что вернёт \texttt{std::copy} для пустого диапазона?
+      Как можно воспользоваться возвращённым итератором?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::transform}}
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{transform.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::transform}: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 transform.cpp -o transform}!
+!\shellcommand{./transform}!
+1 4 9 16
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::fill}}
+
+    Присваивает одно и то же значение каждому элементу диапазона.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{fill.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 fill.cpp -o fill}!
+!\shellcommand{./fill}!
+7 7 7 7 7
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::remove}}
+
+    \enquote{Логически убирает} все вхождения значения:
+    оставшиеся элементы сдвигаются вперёд, возвращается итератор
+    на новую границу.
+    Размер контейнера не меняется.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{remove.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::remove}: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 remove.cpp -o remove}!
+!\shellcommand{./remove}!
+1 3
+size: 5
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Идиома erase-remove}
+
+    Чтобы элемент реально исчез из контейнера,
+    результат \texttt{std::remove} передаётся
+    в \texttt{container::erase}.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{erase-remove.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Идиома erase-remove: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 erase-remove.cpp -o erase-remove}!
+!\shellcommand{./erase-remove}!
+1 3
+size: 2
+    \end{terminalwindow}
+
+    \begin{task}
+      Подумайте, зачем потребовался такой подход к удалению элементов?
+      В чем его преимущество между обычным удалением в цикле?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::reverse}}
+
+    Меняет порядок элементов в диапазоне на обратный.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{reverse.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 reverse.cpp -o reverse}!
+!\shellcommand{./reverse}!
+4 3 2 1
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::find}}
+
+    Находит первый элемент, равный значению,
+    и возвращает итератор на него.
+    Возвращает \texttt{end}, если не нашёл.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{find.cpp}
+
+    \begin{task}
+      Что вернёт \texttt{std::find}, если равного элемента нет?
+    \end{task}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::find}: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 find.cpp -o find}!
+!\shellcommand{./find}!
+found: 7
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::sort}}
+
+    Сортирует элементы диапазона, после вызова
+    диапазон отсортирован.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{sort.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 sort.cpp -o sort}!
+!\shellcommand{./sort}!
+1 2 3 4 5
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::max\_element}}
+
+    Находит наибольший элемент диапазона и возвращает
+    итератор на него, так же как \texttt{std::find}.
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{max-element.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 max-element.cpp -o max-element}!
+!\shellcommand{./max-element}!
+max: 5
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Собственный алгоритм: find\_even}
+
+    Стандартный алгоритм \textemdash \space это шаблон,
+    который \enquote{проходит} диапазон по итераторам
+    и возвращает итератор.
+    Такой алгоритм можно разработать самостоятельно.
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]{Presentations/19-algorithms/}{find-even.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{find\_even: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 find-even.cpp -o find-even}!
+!\shellcommand{./find-even}!
+first even: 4
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Тот же результат даёт \texttt{std::find\_if}}
+
+    \myinputlisting[minted language=cpp]{Presentations/19-algorithms/}{find-if.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::find\_if}: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 find-if.cpp -o find-if}!
+!\shellcommand{./find-if}!
+first even: 4
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Композиция стандартных алгоритмов}
+
+    Функции собирают из стандартных алгоритмов:
+    \texttt{erase\_if} = \texttt{std::remove\_if} + \texttt{c::erase}.
+    Так же устроен \texttt{std::erase\_if} из C++20.
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]{Presentations/19-algorithms/}{erase-if.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{erase\_if}: вывод программы}
+
+    Вывод программы с листинга на прошлом слайде:
+
+    \begin{terminalwindow}
+!\shellcommand{c++ -std=c++23 erase-if.cpp -o erase-if}!
+!\shellcommand{./erase-if}!
+1 3 5
+    \end{terminalwindow}
+
+  \end{frame}
+
+\end{document}
