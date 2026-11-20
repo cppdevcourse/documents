@@ -51,7 +51,7 @@ auto a = 1U + 2L;
     \hfill\break
     Эта проблема решается \textbf{неявным приведением}\footnotemark{} типов
     (implicit conversions).
-    Суть этого действия заключается преобразовании одного из операндов таким образом,
+    Суть этого действия заключается в преобразовании одного из операндов таким образом,
     чтобы оба операнда имели одинаковый тип.
 
     \hfill\break
@@ -68,8 +68,8 @@ auto a = 1U + 2L;
 
     \begin{itemize}
 
-        \item Интегральные типы могут быть повышены до типов большего размера:
-            \verb|char| \rightarrow \verb|int|,
+        \item Интегральные типы: целочисленное повышение
+            \verb|char| \rightarrow \verb|int|, расширяющие приведения
             \verb|unsigned int| \rightarrow \verb|unsigned long|
             и т.д.
 
@@ -133,8 +133,8 @@ auto a = 1U + 2L;
             называются сужающими.
 
             \hfill\break
-            Сужающие преобразования очень часто являются
-            \textit{неопределенным поведением}\footnote{\url{https://github.com/Nekrolm/ubbook/blob/master/numeric/narrowing.md}}.
+            Сужающие преобразования очень часто приводят к
+            \textit{неопределенному поведению}\footnote{\url{https://github.com/Nekrolm/ubbook/blob/master/numeric/narrowing.md}}.
 
         \end{column}
 
@@ -167,7 +167,7 @@ main.cpp:2:19: !\textcolor{orange}{warning}!: conversion from ‘double’ to �
     \frametitle{Сужающие преобразования}
 
     \hfill\break
-    Потеря информации может происходит при преобразовании из беззнакового типа
+    Потеря информации может происходить при преобразовании из беззнакового типа
     в знаковый.
 
     \myinputlisting[minted language=cpp]
@@ -212,7 +212,7 @@ main.cpp:2:19: !\textcolor{red}{error}!: narrowing conversion of ‘3.5e+0’ fr
     \begin{itemize}
 
         \item Любой указатель (кроме указателя на функцию) может быть приведен
-            к типу \verb|*|:
+            к типу \verb|void*|:
 
             \begin{myinplacelisting}[minted language=cpp]
 const int x {};
@@ -330,7 +330,8 @@ void foo(const int i, const double d) {
     }
     {
         const int x { i }; // ok
-        const int y { d }; // compilation error
+        const int y { d }; // compiles with warning
+                           // in g++, ill-formed per standard
     }
 }
     \end{myinplacelisting}
@@ -412,10 +413,12 @@ int* p2 = static_cast<int*>(p1); // compilation error
     \begin{myinplacelisting}[minted language=cpp]
 typedef void(*t_func)(); // alias for type of pointer
                          // to function
-int x {};
-t_func f1 = static_cast<t_func>(&x); // compilation error
-t_func f2 = reinterpret_cast<t_func>(&x);
-f2(); // BOOM
+int main() {
+    int x {};
+    // t_func f1 = static_cast<t_func>(&x); // compilation error
+    t_func f2 = reinterpret_cast<t_func>(&x);
+    f2(); // BOOM
+}
     \end{myinplacelisting}
 
     C-style приведение мало чем отличается от \verb|reinterpret_cast|.

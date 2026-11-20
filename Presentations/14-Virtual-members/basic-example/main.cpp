@@ -1,3 +1,5 @@
+#include "employee.hpp"
+
 void print(Employee* p) {
     p->Print();
 }

@@ -30,10 +30,10 @@
 
 \begin{frame}[fragile]
 
-    \frametitle{Mассив}
+    \frametitle{Массив}
 
     \textbf{Массивом} (array) в C++ называется последовательность объектов
-    одного типа, непрерывно расположенные в памяти один за другим.
+    одного типа, непрерывно расположенных в памяти один за другим.
     Все элементы массива имеют один и тот же размер.
 
     \hfill \break
@@ -70,7 +70,7 @@
 
     \frametitle{Объявление массива с автоматическим \\ временем хранения}
 
-    Синтаксис объявлений массивов с автоматическим времем хранения
+    Синтаксис объявлений массивов с автоматическим временем хранения
     (создаваемых на стеке):
 
     \begin{center}
@@ -95,10 +95,11 @@
 
         \begin{myinplacelisting}[minted language=cpp]
 int arr0[10];
-const short arr2[5];    // массив констант
-char* arr3[1];          // массив указателей
-double arr4[0];         // массив без элементов
-std::string arr5[3];    // массив элементов составных типов
+const short arr2[5] {};  // массив констант
+char* arr3[1];           // массив указателей
+double arr4[0];          // массив без элементов: расширение GCC,
+                         // не часть стандарта
+std::string arr5[3];     // массив элементов составных типов
         \end{myinplacelisting}
     \end{center}
 
@@ -129,7 +130,7 @@ int arr0[5] = {1, 5}; // эквивалентно
     \item Zero-initialization:
 
         \begin{myinplacelisting}[minted language=cpp]
-double arr0[3]; // = { 0.0, 0.0, 0.0 }
+double arr0[3] = {}; // = { 0.0, 0.0, 0.0 }
 int arr1[2] = {0}; // = { 0, 0 }
         \end{myinplacelisting}
 
@@ -151,7 +152,7 @@ unsigned short get_size_from_user();
 
 int main() {
     const unsigned short size = get_size_from_user();
-    int* arr = new int[size]; // zero-initialized
+    int* arr = new int[size](); // zero-initialized
     delete[] arr;
 }
     \end{myinplacelisting}
@@ -187,7 +188,7 @@ int main() {
     \frametitle{Оператор индексирования}
 
     \hfill \break
-    Получить доступ к элемента массива на запись и/или чтение
+    Получить доступ к элементу массива на запись и/или чтение
     можно при помощи \textbf{оператора индексирования}\footnotemark{} \verb|[]|
     (subscript operator).
 
@@ -356,7 +357,7 @@ arr = &x; // compilation error
 
     \frametitle{Массивы и указатели}
 
-    Оператор индексирования \verb|[]| опеределен для указателей.
+    Оператор индексирования \verb|[]| определен для указателей.
     Это удобно использовать для получения доступа к элементу массива с
     динамическим временем хранения:
 
@@ -364,7 +365,7 @@ arr = &x; // compilation error
 #include <iostream>
 
 int main() {
-    int* ptrToArray = new int[10];
+    int* ptrToArray = new int[10]();
     for (unsigned i = 0; i < 10; i++) {
         std::cout << ptrToArray[i] << std::endl;
     }
@@ -387,7 +388,7 @@ int main() {
     \begin{myinplacelisting}[minted language=cpp]
 const char* str = "Hello";
 // эквивалентно
-const char arr[] = { 'H', 'e', 'l', 'l', '0', '\0' };
+const char arr[] = { 'H', 'e', 'l', 'l', 'o', '\0' };
     \end{myinplacelisting}
 
     Строковые литералы обычно располагаются в секциях памяти, недоступных
@@ -395,7 +396,8 @@ const char arr[] = { 'H', 'e', 'l', 'l', '0', '\0' };
     Поэтому указатель на строковый литерал всегда должен быть константным:
 
     \begin{myinplacelisting}[minted language=cpp]
-char* str = "Hello"; // compilation error
+char* str = "Hello"; // ошибка по стандарту;
+                     // в g++ — предупреждение -Wwrite-strings
     \end{myinplacelisting}
 
 \end{frame}
@@ -433,7 +435,7 @@ int main() {
     вне зависимости от расположения массива в памяти (в куче, на стеке или
     в глобальном пространстве).
     В документации на \href{https://en.cppreference.com/}{cppreference.com} они названы
-    \enquote{Null terminated byte strings}\footnotemark{}.
+    \enquote{Null-terminated byte strings}\footnotemark{}.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/string/byte.html}}
 

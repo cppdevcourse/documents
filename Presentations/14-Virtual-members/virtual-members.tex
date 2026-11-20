@@ -41,15 +41,25 @@
 
             \myinputlisting[minted language=cpp]
                 {Presentations/14-Virtual-members/basic-example/}
-                {employee.hpp}
+                {main.cpp}
 
         \end{column}
+
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \frametitle{Виртуальные методы}
+
+    \begin{columns}
 
         \begin{column}{0.5\textwidth}
 
             \myinputlisting[minted language=cpp]
                 {Presentations/14-Virtual-members/basic-example/}
-                {main.cpp}
+                {employee.hpp}
 
         \end{column}
 
@@ -61,7 +71,7 @@
 
     \frametitle{Динамический полиморфизм}
 
-    В С++ виртуальные методы являются одним из механизов поддержки
+    В С++ виртуальные методы являются одним из механизмов поддержки
     \textbf{полиморфизма} (polymorphism): способности одного и того же
     кода работать с объектами разных типов.
     Полиморфизм на основе виртуальных методов называют \textit{динамическим
@@ -275,7 +285,7 @@ struct Base {
 
 struct Derived : Base {
     Derived() : Base() {}
-    void Foo() override { std::println("overriden method"); }
+    void Foo() override { std::println("overridden method"); }
 };
 
 int main() {
