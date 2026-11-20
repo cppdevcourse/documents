@@ -92,21 +92,18 @@ description: Рецепт добавления новой презентации
    	Presentations/<NN-topic>/<topic>.tex \
    	Presentations/presentationtemplate.sty \
    	$(wildcard Presentations/images/*-logo.png) \
-   	$(wildcard Presentations/<NN-topic>/*.cpp) \
-   	$(wildcard Presentations/<NN-topic>/*.h) \
-   	$(wildcard Presentations/<NN-topic>/**/*.cpp) \
-   	$(wildcard Presentations/<NN-topic>/**/*.h) \
+   	$(call pdf_deps,<NN-topic>) \
    	Packages/terminal.sty \
    	Packages/mylisting.sty
-   	$(call generate_pdf,$<,$@)
+   	$(call generate_pdf,Presentations/<NN-topic>/<topic>.tex)
    ```
 
    `Packages/terminal.sty` — только если презентация использует
    `terminalwindow`; `Packages/mylisting.sty` — если есть листинги.
-   Если код лежит в поддиректориях, добавьте явные wildcard именно
-   для этих директорий (`$(wildcard Presentations/<NN-topic>/<sub>/*.cpp)`)
-   — образец `pr-02` (`library/`, `relocations/`): в make `**` —
-   ровно один уровень директории.
+   `$(call pdf_deps,<NN-topic>)` раскрывает кодовые файлы листингов
+   рекурсивно: верхний уровень плюс две вложенные поддиректории
+   (расширения `.cpp`, `.h`, `.hpp`). Если код лежит глубже,
+   добавьте явные wildcard для этих директорий в правило.
 5. Цель `help`: строка
    `@printf "pr-NN\tbuild presentation pr-NN.pdf\n"`.
 6. Цель `install`: строка
@@ -118,9 +115,10 @@ description: Рецепт добавления новой презентации
 - Одна цель (отладка): `nix develop --command make pr-NN`
 - Все цели: `nix develop --command make`
 - Лог сборки: `build/pr-NN.log` (out_dir задан в `.latexmkrc`)
-- После правки вложенного `.cpp`/`.h` (глубже одного уровня) make может
-  не заметить изменение (`**` = один уровень): принудительная пересборка
-  через `make clean` или `rm build/pr-NN.pdf`.
+- После правки кодового файла (включая вложенные) достаточно
+  `make pr-NN`: рецепт `generate_pdf` сам удаляет старый PDF, если
+  какой-либо исходник новее собранного pdf (latexmk не отслеживает
+  файлы minted).
 - Проверка вписываемости на слайды (16:9):
   - `grep -n "Overfull" build/pr-NN.log` — вертикальный перелив
     (`Overfull \vbox`). Горизонтальный перенос строк листинга в лог
@@ -162,3 +160,6 @@ description: Рецепт добавления новой презентации
   только в `nix build` (в `nix develop` всё собирается) — новые файлы
   untracked: сделать `git add Presentations/<NN-topic>/` (стейджинг) и
   повторить `nix build`.
+- PDF не пересобрался после правки кода — файл лежит глубже трёх
+  уровней вложенности и не вошёл в зависимости: добавьте явные
+  wildcard для его директории в правило `pr-NN.pdf`.

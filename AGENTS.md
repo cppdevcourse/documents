@@ -30,11 +30,19 @@ LaTeX sources for the Russian-language course "Введение в разраб�
 
 - PDFs are built with lualatex: `.latexmkrc` selects the engine (with `-shell-escape`, required by minted) and sets `out_dir=build`; the Makefile passes `-lualatex` as well.
 - Code shown on slides is included from real files with `\myinputlisting{<dirname>/}{<file>}` (minted); inline snippets use `mycppinplacelisting` / `myinplacelisting`; command sessions use `terminalwindow` with `\shellcommand{...}`. It is teaching material, so C++ snippets must be accurate and compile.
-- Makefile prerequisites glob source files per directory, but GNU make treats `**` as a single directory level (stacked `**` used for presentations 04–10). After editing a nested `.cpp`/`.h`, force a rebuild with `make clean` or `rm build/<name>.pdf`.
+- Code listing files are prerequisites of every presentation target:
+  the `pdf_deps` macro lists them recursively
+  (top level plus two levels of subdirectories,
+  extensions `.cpp`/`.h`/`.hpp`).
+  The `generate_pdf` recipe removes the built PDF before running
+  latexmk if any source file is newer than the PDF:
+  latexmk does not track code files included via minted,
+  and without this the PDF would stay stale.
+  After editing a nested `.cpp`/`.h`, plain `make pr-NN` suffices.
 
 ## Adding a document
 
-Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in six places: the `.PHONY` list, the `build:` prerequisites, the alias `pr-NN: pr-NN.pdf`, the `pr-NN.pdf:` rule (with wildcards + `$(call generate_pdf)`), the `help:` line, and the `install:` copy rule (deliverable filenames are ASCII, e.g. `presentations/01-intro.pdf`). Details in the skill `.opencode/skills/new-presentation/`.
+Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in six places: the `.PHONY` list, the `build:` prerequisites, the alias `pr-NN: pr-NN.pdf`, the `pr-NN.pdf:` rule (with `$(call pdf_deps,<NN-topic>)` and `$(call generate_pdf,Presentations/<NN-topic>/<topic>.tex)`), the `help:` line, and the `install:` copy rule (deliverable filenames are ASCII, e.g. `presentations/01-intro.pdf`). Details in the skill `.opencode/skills/new-presentation/`.
 
 ## Presentation conventions
 
