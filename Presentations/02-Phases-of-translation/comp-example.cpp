@@ -5,5 +5,4 @@ float PI() {
 int main() {
     const auto pi
         = PI();
-    (void)pi;
 }

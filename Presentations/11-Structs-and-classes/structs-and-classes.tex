@@ -78,7 +78,6 @@ struct ComplexNumber {
     \begin{myinplacelisting}[minted language=cpp]
 int main() {
     ComplexNumber z;
-    (void)z;
 }
     \end{myinplacelisting}
 
@@ -264,7 +263,6 @@ struct Foo {
 
 int main() {
     Foo f { 0xAA, 0xBBBBBBBB };
-    (void)f;
 }
             \end{myinplacelisting}
 
@@ -421,7 +419,6 @@ int main() {
     const ComplexNumber number {};
     number.Multiply(2.0); // ошибка компиляции
     const double mod = number.Modulus();
-    (void)mod;
 }
     \end{myinplacelisting}
 
@@ -509,7 +506,6 @@ int main() {
     ComplexNumber z1 {-2.0, 2.0};
     ComplexNumber z2 {0.0, -3.0};
     ComplexNumber z3 { z0 + z1 + z2 };
-    (void)z3;
 }
     \end{myinplacelisting}
 

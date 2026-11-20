@@ -774,14 +774,11 @@ int callback(int, int) { return 1; }
 void bar(int (*p)(int, int)) {
     const int x = (*p)(1, 2); // calling the
                               // function p points to
-    (void)x;
 }
 
 int main() {
     void (*pfoo)() = &foo; // pointer to function foo
     void (*pnull)() = nullptr; // null pointer to function
-    (void)pfoo;
-    (void)pnull;
     // pointer to function callback
     int (*pcallback)(int, int) = &callback;
     bar(pcallback);
@@ -810,7 +807,6 @@ void bar(t_pfunc p);
 int main() {
     t_pfunc pcallback = callback;
     t_pfunc pcallback0 = &callback; // same
-    (void)pcallback0;
     bar(pcallback);
 }
     \end{myinplacelisting}
@@ -856,7 +852,6 @@ int a(); int b(); int c();
 
 int main() {
     int (*arr0[])() = {a, b, c};
-    (void)arr0;
 
     using t_pfunc = int(*)();
     t_pfunc arr1[] = {a, b, c};
@@ -887,7 +882,6 @@ void bar(t_rfunc callback) {
 
 int main() {
     t_rfunc callback = foo;
-    bar(callback);
 }
     \end{myinplacelisting}
 

@@ -5,5 +5,4 @@
 
 int main() {
     auto pi = PI;
-    (void)pi;
 }

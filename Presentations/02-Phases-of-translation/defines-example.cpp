@@ -4,6 +4,5 @@
 
 int MAIN_FUNCTION() {
     int i = 1 + MAGIC_NUMBER;
-    (void)i;
     return 0;
 BRACKET

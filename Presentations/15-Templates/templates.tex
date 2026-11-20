@@ -407,8 +407,6 @@ void foo() {
     // template instantiations
     int a = IntFoo1<char>{}.a;
     int b = IntFoo2<bool>{}.b;
-    (void)a;
-    (void)b;
 }
         \end{myinplacelisting}
 
@@ -491,8 +489,6 @@ using Array = int[S];
 void foo() {
     Array<1> arr0 = {0};
     Array<3> arr1 = {0, 1, 2};
-    (void)arr0;
-    (void)arr1;
 }
         \end{myinplacelisting}
       };
@@ -949,9 +945,6 @@ int main() {
     Tuple <> t0 {};
     Tuple <int> t1 {};
     Tuple <int, double> t2 {};
-    (void)t0;
-    (void)t1;
-    (void)t2;
 }
     \end{myinplacelisting}
 

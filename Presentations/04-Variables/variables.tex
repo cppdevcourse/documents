@@ -201,9 +201,10 @@ int main() {
     \begin{myinplacelisting}[minted language=cpp]
 double d {};
 
+d; // ok
+
 int main() {
     double copy = d; // ok
-    (void)copy;
 }
     \end{myinplacelisting}
 
@@ -218,7 +219,7 @@ int main() {
     \begin{myinplacelisting}[minted language=cpp]
 void foo() {
     int i = 0;
-    (void)i; // ok
+    i; // ok
 }
 
 int main() {
@@ -226,12 +227,12 @@ int main() {
 
     {
         bool b;
-        (void)b; // ok
+        b; // ok
     }
     b; // compilation error
 
     for (int j = 0; j < 10; ++j) {
-        (void)j; // ok
+        j; // ok
     }
     j; // compilation error
 }
@@ -251,7 +252,7 @@ int main() {
 
             \begin{myinplacelisting}[minted language=cpp]
 void foo(int x) {
-    (void)x; // ok
+    x; // ok
 }
 
 x; // compilation error
@@ -267,12 +268,12 @@ x; // compilation error
 namespace X {
     std::string s;
     void foo() {
-        (void)s; // ok
-        (void)X::s; // ok
+        s; // ok
     }
 }
 
 s; // compilation error
+X::s; // ok
             \end{myinplacelisting}
 
         \end{column}
@@ -294,14 +295,11 @@ s; // compilation error
             \begin{myinplacelisting}[minted language=cpp]
 void foo() {
     const bool b = true;
-    (void)b;
     {
         {
             long l = {};
-            (void)l;
         }
         float f {};
-        (void)f;
     }
 }
             \end{myinplacelisting}
@@ -319,8 +317,8 @@ namespace X {
 }
 
 void foo() {
-    (void)X::a;
-    (void)X::Y::a;
+    X::a;
+    X::Y::a;
 }
             \end{myinplacelisting}
 
@@ -387,9 +385,7 @@ void f() {
         char c0 = {}; // <- c0's lifetime begins
         {
             char c1 = {}; // <- c1's lifetime begins
-            (void)c1;
         } // <- c1's lifetime ends
-        (void)c0;
     } // <- c0's lifetime ends
 }
     \end{myinplacelisting}
@@ -486,7 +482,6 @@ namespace X {
 
 void foo() {
     static float f {};
-    (void)f;
 }
     \end{myinplacelisting}
 

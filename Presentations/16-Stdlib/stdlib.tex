@@ -365,8 +365,6 @@ int main() {
 
     Array::value_type i = 0; // int
     Array::size_type s = 0u; // std::size_t
-    (void)i;
-    (void)s;
 }
     \end{mycppinplacelisting}
 
@@ -1254,7 +1252,6 @@ struct User {
     в которых пользователи будут ключами:
 
     \begin{mycppinplacelisting}[after skip=0mm]
-// цель: псевдокод, не компилируется
 std::unordered_set<User> users {
     {"Sean", "Bean"},
     {"Alfie", "Allen"}
@@ -1536,9 +1533,9 @@ int main() {
 
     \begin{mycppinplacelisting}
 std::vector<int> v {/*...*/};
-(void)v.begin();
-(void)v.rbegin();
-(void)v.cend();
+v.begin();
+v.rbegin();
+v.cend();
 // ...
     \end{mycppinplacelisting}
 
@@ -1546,9 +1543,9 @@ std::vector<int> v {/*...*/};
 
     \begin{mycppinplacelisting}
 std::vector<int> v {/*...*/};
-(void)std::begin(v);
-(void)std::rbegin(v);
-(void)std::cend(v);
+std::begin(v);
+std::rbegin(v);
+std::cend(v);
 // ...
     \end{mycppinplacelisting}
 
@@ -1597,14 +1594,14 @@ std::vector<int> v {/*...*/};
 
     \begin{mycppinplacelisting}
 int array[] = {1, 2, 3};
-(void)(array + 3); // valid pointer
-(void)(array + 4); // invalid pointer
+array + 3; // valid pointer
+array + 4; // invalid pointer
 
 std::vector<int> v {1, 2, 3};
-(void)v.end(); // valid iterator
-(void)(v.begin() + 3); // also valid
-(void)(v.rbegin() + 3); // also valid
-(void)(v.begin() + 4); // invalid iterator
+v.end(); // valid iterator
+v.begin() + 3; // also valid
+v.rbegin() + 3; // also valid
+v.begin() + 4; // invalid iterator
     \end{mycppinplacelisting}
 
     Однако, разыменовывание такого итератора является
