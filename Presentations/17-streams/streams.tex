@@ -1,0 +1,460 @@
+\documentclass[compress, 8pt, aspectratio=169]{beamer}
+
+\usepackage{presentationtemplate}
+\usepackage[askip=3mm, bskip=3mm]{terminal}
+\usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
+\usepackage{tabularray}
+
+\tcbset{
+    listingbase17/.style={
+        listing engine=minted,
+        minted options={
+            fontsize=\footnotesize,
+            breaklines,
+            breakanywhere,
+            linenos,
+            escapeinside=||,
+            numbersep=2pt
+        },
+        listing only,
+        left skip=0mm,
+        right skip=0mm,
+        after skip=3mm,
+        before skip=3mm,
+        left=0mm,
+        right=0mm,
+        top=0mm,
+        bottom=0mm,
+        boxrule=0.02cm,
+        colback=white,
+        colframe=black,
+        colbacktitle=gray!10!white,
+        coltitle=black,
+        sharp corners
+    }
+}
+
+\renewtcbinputlisting{\myinputlisting}[3][]{%
+    listing file={#2#3},
+    title=#3,
+    fonttitle=\it\footnotesize,
+    listingbase17,
+    #1
+}
+
+\NewTCBListing{terminalwindow17}{ O{} }{
+    listing engine=minted,
+    title=>\_\null\hfill x,
+    minted options={
+        fontsize=\footnotesize,
+        breaklines,
+        breakanywhere,
+        escapeinside=!!,
+        breaksymbolleft=
+    },
+    minted language=text,
+    listing only,
+    left skip=0mm,
+    right skip=0mm,
+    after skip=3mm,
+    before skip=3mm,
+    left=0mm,
+    right=0mm,
+    top=0mm,
+    bottom=0mm,
+    boxrule=0.02cm,
+    colback=white,
+    colframe=black,
+    colbacktitle=black,
+    fonttitle=\ttfamily\footnotesize,
+    #1
+}
+
+\newtcolorbox{task}{
+    colback=yellow!50!white,
+    boxrule=0.02cm,
+    colframe=black,
+    sharp corners,
+    left=0mm,
+    right=0mm,
+    top=0mm,
+    bottom=0mm,
+    before upper={\textbf{Задание}:\:},
+}
+
+\title{Стандартная библиотека: потоки}
+\subtitle{\texttt{iostream}, \texttt{sstream}, \texttt{fstream}}
+
+\begin{document}
+
+  \frame[plain]{\titlepage}
+
+  \begin{frame}
+
+    \frametitle{Потоки стандартной библиотеки}
+
+    \begin{itemize}
+
+      \item Поток \textendash{} последовательность символов:
+        для любого назначения одни и те же операторы
+        \texttt{>>} (чтение) и \texttt{<<} (запись).
+
+    \end{itemize}
+
+    {\footnotesize
+    \begin{tblr}{
+      colspec = {|X[0.22,l]|X[0.58,l]|X[0.20,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Заголовок & Потоки & Назначение \\
+      \texttt{<iostream>} & \texttt{std::cin}, \texttt{std::cout}, \texttt{std::cerr} & консоль \\
+      \texttt{<sstream>} & \texttt{std::istringstream}, \texttt{std::ostringstream}, \texttt{std::stringstream} & строка \\
+      \texttt{<fstream>} & \texttt{std::ifstream}, \texttt{std::ofstream}, \texttt{std::fstream} & файл \\
+    \end{tblr}
+    }
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{std::cin} и \texttt{std::cout}}
+
+    \begin{itemize}
+
+      \item \texttt{std::cin} / \texttt{std::cout} \textendash{}
+        стандартные объекты, заголовок \texttt{<iostream>}.
+
+      \item \texttt{>>} читает значения (пропуская пробельные),
+        \texttt{<<} записывает.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/17-streams/}
+        {echo.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 echo.cpp -o echo}!
+!\shellcommand{printf 'Ada 36\textbackslash n' | ./echo}!
+Ada, 36
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Манипуляторы}
+
+    \begin{itemize}
+
+      \item Манипуляторы из \texttt{<iomanip>} меняют формат вывода.
+
+      \item \texttt{std::setw} \textendash{} ширина поля,
+        \texttt{std::fixed} \textendash{} запятая,
+        \texttt{std::setprecision} \textendash{} точность.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/17-streams/}
+        {manip.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 manip.cpp -o manip \&\& ./manip}!
+  1: 3.14
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{operator<<} для своего типа}
+
+    \begin{itemize}
+
+      \item \texttt{<<} \textendash{} обычный перегружаемый оператор:
+        стандартная библиотека определяет его для встроенных типов,
+        для своего \textendash{} определяем сами.
+
+      \item Левый операнд \textendash{} поток, поэтому свободная функция;
+        \texttt{const Point\&} \textendash{} доступ к полям;
+        возвращаем \texttt{out} \textendash{} работают цепочки.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, title=point\_out.cpp]
+        {Presentations/17-streams/}
+        {point_out.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 point\_out.cpp -o point\_out \&\& ./point\_out}!
+(1, 2) -> (3, 4)
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{operator>>} для своего типа}
+
+    \begin{itemize}
+
+      \item Симметрично: \texttt{Point\&} (не \texttt{const})
+        \textendash{} объект заполняется; возвращаем \texttt{in}
+        \textendash{} работают цепочки.
+
+      \item Состояние потока передаётся: работает идиом
+        \texttt{while (in >> p)} (слайд 11).
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, title=point\_in.cpp]
+        {Presentations/17-streams/}
+        {point_in.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 point\_in.cpp -o point\_in}!
+!\shellcommand{printf '3 4\textbackslash n' | ./point\_in}!
+3 4
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{ostringstream}: запись в строку}
+
+    \begin{itemize}
+
+      \item \texttt{std::ostringstream} (\texttt{<sstream>})
+        \textendash{} выходной поток в строку.
+
+      \item Оператор \texttt{<<} тот же; результат \textendash{}
+        метод \texttt{str()}.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/17-streams/}
+        {ostr.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 ostr.cpp -o ostr \&\& ./ostr}!
+answer: 42
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{istringstream}: чтение из строки}
+
+    \begin{itemize}
+
+      \item \texttt{std::istringstream} \textendash{} входной поток
+        из строки.
+
+      \item \texttt{>>} разбирает значения разных типов.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/17-streams/}
+        {istr.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 istr.cpp -o istr \&\& ./istr}!
+42 hello
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{stringstream}: чтение и запись}
+
+    \begin{itemize}
+
+      \item \texttt{std::stringstream} \textendash{} двухсторонний:
+        \texttt{>>} и \texttt{<<} в одном объекте.
+
+      \item После чтения до конца (eofbit) запись невозможна
+        \textendash{} нужен \texttt{clear()}.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/17-streams/}
+        {ss.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 ss.cpp -o ss \&\& ./ss}!
+sum: 30
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{ofstream}: запись в файл}
+
+    \begin{itemize}
+
+      \item \texttt{std::ofstream} (\texttt{<fstream>})
+        \textendash{} запись в файл.
+
+      \item По умолчанию файл создаётся заново
+        (существующий \textendash{} обрезается);
+        \texttt{<<} \textendash{} как у \texttt{std::cout}.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, title=write\_file.cpp]
+        {Presentations/17-streams/}
+        {write_file.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 write\_file.cpp -o write \&\& ./write}!
+!\shellcommand{cat data.txt}!
+1 2 3
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{ifstream}: чтение из файла}
+
+    \begin{itemize}
+
+      \item \texttt{std::ifstream} \textendash{} чтение из файла.
+
+      \item Идиом: \texttt{while (in >> n)} \textendash{}
+        цикл завершается при неудачном чтении (конец файла).
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, title=read\_file.cpp]
+        {Presentations/17-streams/}
+        {read_file.cpp}
+
+    \begin{terminalwindow17}
+!\shellcommand{g++ -std=c++23 read\_file.cpp -o read \&\& ./read}!
+1
+2
+3
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{fstream}: чтение и запись}
+
+    \begin{itemize}
+
+      \item \texttt{std::fstream} \textendash{} оба направления
+        в одном объекте (режим
+        \texttt{std::ios\_base::in | std::ios\_base::out}).
+
+      \item \texttt{seekg(0, std::ios\_base::end)} \textendash{}
+        дописать в конец файла.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, after skip=0mm]
+        {Presentations/17-streams/}
+        {count.cpp}
+
+    Запуск дважды \textendash{} файл растёт:
+
+    \begin{terminalwindow17}[before skip=0mm]
+!\shellcommand{printf 3 > count.txt}!
+!\shellcommand{g++ -std=c++23 count.cpp -o count \&\& ./count}!
+4
+!\shellcommand{cat count.txt}!
+3 4
+!\shellcommand{./count \&\& cat count.txt}!
+4
+3 4 4
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{\texttt{ifstream} или \texttt{ofstream}?}
+
+    \begin{itemize}
+
+      \item Состояние потока: \texttt{good()}, \texttt{fail()}.
+
+    \end{itemize}
+
+    {\footnotesize
+    \begin{tblr}{
+      colspec = {|X[0.30,l]|X[0.30,l]|X[0.40,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Класс & Режим по умолчанию & Файла нет \\
+      \texttt{std::ifstream} & \texttt{in} & устанавливается \texttt{failbit} \\
+      \texttt{std::ofstream} & \texttt{out} & файл создаётся (существующий \textendash{} обрезается) \\
+      \texttt{std::fstream} & \texttt{in | out} & устанавливается \texttt{failbit} \\
+    \end{tblr}
+    }
+
+    \myinputlisting[minted language=cpp, title=open\_check.cpp, after skip=0mm]
+        {Presentations/17-streams/}
+        {open_check.cpp}
+
+    \begin{terminalwindow17}[before skip=0mm]
+!\shellcommand{g++ -std=c++23 open\_check.cpp -o check \&\& ./check}!
+ofstream: true
+ifstream: false
+!\shellcommand{ls new.txt}!
+new.txt
+    \end{terminalwindow17}
+
+  \end{frame}
+
+  \begin{frame}
+
+    \frametitle{Итоги}
+
+    {\footnotesize
+    \begin{tblr}{
+      colspec = {|X[0.60,l]|X[0.40,l]|},
+      row{1} = {font=\bfseries},
+      hlines, vlines,
+      rowsep = 0.8ex,
+      colsep = 1.0ex,
+    }
+      Задача & Объект \\
+      чтение с клавиатуры & \texttt{std::cin} \\
+      вывод на экран & \texttt{std::cout} \\
+      разбор строки & \texttt{std::istringstream} \\
+      форматирование в строку & \texttt{std::ostringstream} \\
+      чтение файла & \texttt{std::ifstream} \\
+      запись в файл & \texttt{std::ofstream} \\
+      чтение + запись & \texttt{std::fstream} \\
+      вывод / ввод собственного типа & \texttt{operator<<} / \texttt{operator>>} \\
+    \end{tblr}
+    }
+
+    \begin{task}
+      Две программы.
+      Первая читает два числа из \texttt{std::cin}
+      и записывает их в файл через \texttt{std::ofstream}.
+      Вторая читает числа из файла через \texttt{std::ifstream}
+      и печатает их сумму.
+    \end{task}
+
+  \end{frame}
+
+\end{document}
