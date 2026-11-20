@@ -23,6 +23,7 @@ BUILD_DIR := build
 	pr-14 \
 	pr-15 \
 	pr-16 \
+	pr-17 \
 	pr-19
 
 all: build
@@ -44,6 +45,7 @@ build: \
 	pr-14 \
 	pr-15 \
 	pr-16 \
+	pr-17 \
 	pr-19
 
 install: build
@@ -64,6 +66,7 @@ install: build
 	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-dynamic-dispatch.pdf"
 	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-templates.pdf"
 	cp "$(BUILD_DIR)/pr-16.pdf" "$(PREFIX)/presentations/16-standard-library.pdf"
+	cp "$(BUILD_DIR)/pr-17.pdf" "$(PREFIX)/presentations/17-streams.pdf"
 	cp "$(BUILD_DIR)/pr-19.pdf" "$(PREFIX)/presentations/19-algorithms.pdf"
 
 clean:
@@ -91,6 +94,7 @@ help:
 	@printf "pr-14\tbuild presentation pr-14.pdf\n"
 	@printf "pr-15\tbuild presentation pr-15.pdf\n"
 	@printf "pr-16\tbuild presentation pr-16.pdf\n"
+	@printf "pr-17\tbuild presentation pr-17.pdf\n"
 	@printf "pr-19\tbuild presentation pr-19.pdf\n"
 
 pr-01: pr-01.pdf
@@ -109,6 +113,7 @@ pr-13: pr-13.pdf
 pr-14: pr-14.pdf
 pr-15: pr-15.pdf
 pr-16: pr-16.pdf
+pr-17: pr-17.pdf
 pr-19: pr-19.pdf
 
 define generate_pdf
@@ -280,6 +285,16 @@ pr-16.pdf: \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
 	Packages/mylisting.sty
+	$(call generate_pdf,$<,$@)
+
+pr-17.pdf: \
+	Presentations/17-streams/streams.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	$(wildcard Presentations/17-streams/*.cpp) \
+	$(wildcard Presentations/17-streams/*.h) \
+	$(wildcard Presentations/17-streams/**/*.cpp) \
+	$(wildcard Presentations/17-streams/**/*.h)
 	$(call generate_pdf,$<,$@)
 
 pr-19.pdf: \
