@@ -4,7 +4,6 @@
 \usepackage[askip=3mm, bskip=3mm]{terminal}
 \usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
 \tcbuselibrary{hooks}
-\usepackage{csquotes}
 
 \title{Стандартная библиотека: строки}
 
@@ -16,40 +15,33 @@
 
     \frametitle{Строки: \texttt{char[]} vs \texttt{std::string}}
 
-    \begin{itemize}
+    \begin{columns}
 
-      \item \texttt{char[]}: изменение посимвольно;
-        операторов сравнения и конкатенации нет; память \textendash \space вручную.
+      \begin{column}{0.48\textwidth}
 
-      \item \texttt{std::string}: значение; память управляет объект;
-        строку можно переприсвоить целиком.
+        \myinputlisting[minted language=cpp, minted options app={fontsize=\normalsize}]
+            {Presentations/18-strings/}
+            {why.cpp}
 
-    \end{itemize}
+      \end{column}
 
-    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
-        {Presentations/18-strings/}
-        {why.cpp}
+      \begin{column}{0.52\textwidth}
 
-    \begin{terminalwindow}
+        \begin{terminalwindow}
 !\shellcommand{g++ why.cpp -o why \&\& ./why}!
 Eda
 Grace
-    \end{terminalwindow}
+        \end{terminalwindow}
+
+      \end{column}
+
+    \end{columns}
 
   \end{frame}
 
   \begin{frame}[fragile]
 
     \frametitle{Создание строк}
-
-    \begin{itemize}
-
-      \item Инициализация: из литерала, из \texttt{(count, char)},
-        копирование, перемещение.
-
-      \item \texttt{(count, char)} \textendash \space повтор одного символа.
-
-    \end{itemize}
 
     \myinputlisting[minted language=cpp]
         {Presentations/18-strings/}
@@ -68,10 +60,10 @@ C++ ***** C++
 
     \begin{itemize}
 
-      \item Конкатенация: \texttt{+}, \texttt{+=} (также \texttt{append}).
+      \item Конкатенация: \texttt{+}, \texttt{+=}, метод \texttt{append}.
 
-      \item Сравнение: \texttt{<}, \texttt{==}, \texttt{<=>}
-        \textendash \space лексикографическое, побайтово.
+      \item Сравнение \texttt{<}, \texttt{==}, \texttt{<=>}
+        идёт лексикографически, побайтово.
 
     \end{itemize}
 
@@ -90,17 +82,6 @@ true true
 
     \frametitle{Доступ к символам}
 
-    \begin{itemize}
-
-      \item \texttt{[]} \textendash \space без проверки границ (UB при выходе за них);
-        \texttt{at} \textendash \space бросает \texttt{std::out\_of\_range}.
-
-      \item \texttt{front}/\texttt{back};
-        \texttt{c\_str()}/\texttt{data()} \textendash \space строка как C-строка
-        (с завершающим нулём).
-
-    \end{itemize}
-
     \myinputlisting[minted language=cpp]
         {Presentations/18-strings/}
         {access.cpp}
@@ -118,42 +99,34 @@ C
 
     \frametitle{Поиск в строке}
 
-    \begin{itemize}
+    \begin{columns}
 
-      \item \texttt{find}/\texttt{rfind} \textendash \space позиция вхождения
-        или \texttt{std::string::npos}, если не найдено.
+      \begin{column}{0.56\textwidth}
 
-      \item \texttt{starts\_with}/\texttt{ends\_with} \textendash \space C++20;
-        \texttt{contains} \textendash \space C++23.
+        \myinputlisting[minted language=cpp, minted options app={fontsize=\normalsize}]
+            {Presentations/18-strings/}
+            {find.cpp}
 
-    \end{itemize}
+      \end{column}
 
-    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
-        {Presentations/18-strings/}
-        {find.cpp}
+      \begin{column}{0.44\textwidth}
 
-    \begin{terminalwindow}
+        \begin{terminalwindow}
 !\shellcommand{g++ find.cpp -o find \&\& ./find}!
 16
 17
 true true true
-    \end{terminalwindow}
+        \end{terminalwindow}
+
+      \end{column}
+
+    \end{columns}
 
   \end{frame}
 
   \begin{frame}[fragile]
 
     \frametitle{Подстроки: \texttt{substr}, \texttt{replace}, \texttt{erase}}
-
-    \begin{itemize}
-
-      \item \texttt{substr(pos, len)} \textendash \space копия подстроки
-        (без \texttt{len} \textendash \space до конца).
-
-      \item \texttt{replace(pos, len, str)} \textendash \space замена участка;
-        \texttt{erase(pos, len)} \textendash \space удаление участка.
-
-    \end{itemize}
 
     \myinputlisting[minted language=cpp]
         {Presentations/18-strings/}
@@ -172,18 +145,6 @@ bye,
 
     \frametitle{Преобразование с числами}
 
-    \begin{itemize}
-
-      \item В строку: \texttt{std::to\_string} (числовые типы).
-
-      \item Из строки: \texttt{stoi}, \texttt{stoul}, \texttt{stof},
-        \texttt{stod}, ...; третий аргумент \textendash \space основание.
-
-      \item Ошибка парсинга \textendash \space исключение
-        \texttt{invalid\_argument}/\texttt{out\_of\_range}.
-
-    \end{itemize}
-
     \myinputlisting[minted language=cpp]
         {Presentations/18-strings/}
         {convert.cpp}
@@ -198,7 +159,7 @@ bye,
 
   \end{frame}
 
-  \begin{frame}[fragile]
+  \begin{frame}
 
     \frametitle{Small String Optimization (SSO)}
 
@@ -207,15 +168,20 @@ bye,
       \item Короткие строки хранятся в самом объекте (на стеке),
         без выделения в куче.
 
-      \item Порог \textendash \space свойство реализации: libstdc++ (x86-64)
-        \textendash \space 15 символов, \texttt{sizeof(std::string)} = 32.
+      \item Создание, копирование и перемещение таких строк быстрее.
 
-      \item Проверяем по адресу \texttt{data()}: короткий
-        \textendash \space внутри объекта, длинный \textendash \space в куче.
+      \item Порог зависит от реализации: в libstdc++ (x86-64)
+        это 15 символов, \texttt{sizeof(std::string)} = 32.
 
     \end{itemize}
 
-    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{SSO: пример}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\normalsize}]
         {Presentations/18-strings/}
         {sso.cpp}
 
@@ -230,19 +196,7 @@ bye,
 
   \begin{frame}[fragile]
 
-    \frametitle{Unicode: строка \textendash \space это байты}
-
-    \begin{itemize}
-
-      \item \texttt{std::string} хранит байты; по соглашению \textendash \space UTF-8.
-
-      \item \texttt{size()}/\texttt{length()} \textendash \space число байт,
-        а не символов.
-
-      \item \texttt{s[i]} \textendash \space по байтам: многобайтовый символ
-        \enquote{разрывается}.
-
-    \end{itemize}
+    \frametitle{Unicode: строка \textemdash \space это байты}
 
     \myinputlisting[minted language=cpp]
         {Presentations/18-strings/}
@@ -250,8 +204,8 @@ bye,
 
     \begin{terminalwindow}
 !\shellcommand{g++ utf8-bytes.cpp -o utf8-bytes \&\& ./utf8-bytes}!
-bytes: 6
-f0 9f 9a 80 68 69
+bytes: 4
+d0 af 68 69
     \end{terminalwindow}
 
   \end{frame}
@@ -260,29 +214,9 @@ f0 9f 9a 80 68 69
 
     \frametitle{Обход по символам: \texttt{std::u8string\_view}}
 
-    \begin{itemize}
-
-      \item \texttt{std::u8string\_view} (C++20) \textendash \space вид
-        на UTF-8-байты; итерация идёт по байтам \texttt{char8\_t},
-        не по кодовым точкам.
-
-      \item Конструктора из \texttt{std::string} нет: делаем вид
-        на байты строки \textendash \space \enquote{строка \textendash \space просто байты}.
-
-      \item Число кодовых точек \textendash \space число непродолжающих
-        байт (не начинающихся с \texttt{0b10}).
-
-    \end{itemize}
-
     \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
         {Presentations/18-strings/}
         {u8string-view.cpp}
-
-  \end{frame}
-
-  \begin{frame}[fragile]
-
-    \frametitle{Вывод программы с листинга на прошлом слайде}
 
     \begin{terminalwindow}
 !\shellcommand{g++ u8string-view.cpp -o u8string-view \&\& ./u8string-view}!
@@ -294,20 +228,6 @@ bytes: 12 chars: 6
   \begin{frame}[fragile]
 
     \frametitle{Строковый литерал \texttt{""s} (C++14)}
-
-    \begin{itemize}
-
-      \item Литерал \texttt{"...s"} \textendash \space объект
-        \texttt{std::string}; \texttt{"...sv"} (C++17)
-        \textendash \space \texttt{std::string\_view}.
-
-      \item Каждый литерал \textendash \space новое временное значение:
-        \texttt{"a"s + "b"} \textendash \space два временных \texttt{std::string}.
-
-      \item \texttt{using namespace std::literals::string\_literals}
-        \textendash \space стандартный способ активации.
-
-    \end{itemize}
 
     \myinputlisting[minted language=cpp]
         {Presentations/18-strings/}
