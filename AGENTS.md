@@ -44,6 +44,8 @@ Create `<NN>-<topic>/` and the `.tex`, then edit the Makefile in six places: the
 - The course standard is C++23; every example must compile with `g++ -std=c++23 -Wall -Wextra`. `cpp-expert` compiles and verifies each example before handing the draft over (see "Roles and pipeline (subagents)").
 - Listing limits (measured for 16:9, 8pt, `\footnotesize` with line numbers): no more than 81 characters per line (full-width listing), no more than 38 (a `0.48\textwidth` column), no more than 24 lines per frame (single listing; less when the slide also carries text). Beyond that — split the slide or reduce the font size. Fit check: `grep -n "Overfull" build/pr-NN.log` (vertical overflow only — a horizontal line wrap is not logged) + `pdftotext -layout` / `pdftoppm -png -r 60` (poppler-utils is in the devshell).
 - Drafts live in `build/drafts/` (gitignored): plan — `build/drafts/NN-topic.plan.md`, text — `build/drafts/NN-topic.md`, example code — `build/drafts/NN-topic/`.
+- Slide text is impersonal: no "personal" address to the audience ("вы передаёте", "мы напишем", "разбираем", "вызвали", "меняйте") — only impersonal formulations ("итераторы на данные передаются", "алгоритм можно разработать самостоятельно").
+- Long dashes (—) are preferably avoided in slide text: rephrase instead of the dash (bad: "не нашёл — возвращает end"; good: "возвращает end, если не нашёл"). If a dash does remain, write `\textemdash \space` — a regular space after `\textemdash` is swallowed by lualatex (in the PDF it becomes "слово—слово"); the convention is in `Presentations/08-Arrays/arrays.tex`.
 
 ## Roles and pipeline (subagents)
 
