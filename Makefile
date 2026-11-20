@@ -77,7 +77,7 @@ help:
 	@printf "pr-03\tbuild presentation pr-03.pdf\n"
 	@printf "pr-04\tbuild presentation pr-04.pdf\n"
 	@printf "pr-05\tbuild presentation pr-05.pdf\n"
-	@printf "pr-06\tbuild presentation pr-05.pdf\n"
+	@printf "pr-06\tbuild presentation pr-06.pdf\n"
 	@printf "pr-07\tbuild presentation pr-07.pdf\n"
 	@printf "pr-08\tbuild presentation pr-08.pdf\n"
 	@printf "pr-09\tbuild presentation pr-09.pdf\n"
