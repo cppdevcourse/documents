@@ -56,6 +56,7 @@
     В объявление функции входят:
 
     \begin{itemize}
+        \item тип возвращаемого значения;
         \item имя функции;
         \item параметры функции (без имен);
         \item спецификаторы \verb|constexpr|, \verb|consteval|, \verb|inline|, \verb|static| и др.
@@ -118,6 +119,8 @@ main.cpp:2:5: !\textcolor{red}{error}!: ‘foo’ was not declared in this scope
     Функция может быть определена как отдельно от объявления, так и вместе с ним.
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <iostream>
+
 void foo(); // declaration
 
 void bar() { // declaration and definition
@@ -144,7 +147,7 @@ void foo() { // definition
     Функция должна быть определена в программе только один раз\footnotemark{}.
 
     \footnotetext{Несколько определений являются нарушением
-        \href{https://en.cppreference.com/w/cpp/language/definition}{One Defition Rule}
+        \href{https://en.cppreference.com/w/cpp/language/definition}{One Definition Rule}
         (ODR violation).}
 
     \begin{task}
@@ -238,7 +241,7 @@ void foo(int x, int y/* = 0*/) {
 }
 
 int main() {
-    foo(1); // is equal with foo(1, 0);
+    foo(1); // is the same as foo(1, 0);
     foo(1, 2); // override default argument
 }
     \end{myinplacelisting}
@@ -312,7 +315,7 @@ x=1
 x=-1
             \end{terminalwindow}
 
-            Объект ссылочного типа (ссылка или указатель) все равно будут скопирован,
+            Объект ссылочного типа (ссылка или указатель) все равно будет скопирован,
             но позволит изменить объект, на который он ссылается.
 
         \end{column}
@@ -386,7 +389,7 @@ bar
 
     Функция может возвращать результат своего выполнения в \textbf{возвращаемоем значении}
     (return value).
-    Возвращаемое есть в определении функции, но не является частью её \textbf{сигнатуры}
+    Возвращаемое значение присутствует в определении функции, но не является частью её \textbf{сигнатуры}
     (function signature\footnotemark{}).
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/function}}
@@ -478,7 +481,7 @@ int foo() {
     \frametitle{NRVO}
 
     Возвращаемое значение обычно копируется в вызывающий контекст.
-    Иногда компилятор может применить \textit{необязательную} варицию оптимизации
+    Иногда компилятор может применить \textit{необязательную} вариацию оптимизации
     Copy elision, известную как Named Return Value Optimization (NRVO).
     Эта оптимизация помещает возвращаемое значение сразу в вызывающий контекст
     \textit{без копирования}.
@@ -490,7 +493,7 @@ struct MyLargeObject { /* ... */ };
 
 MyLargeObject foo() {
     MyLargeObject obj {};
-    return obl; // may be optimized with copy elision
+    return obj; // may be optimized with copy elision
 }
     \end{myinplacelisting}
 
@@ -517,7 +520,7 @@ unsigned factorial(unsigned n) {
 
     \frametitle{Переполнение стека}
 
-    Неконтролируемая (бесконечнaя) рекурсия или рекурсия с очень большим число рекурсивных
+    Неконтролируемая (бесконечная) рекурсия или рекурсия с очень большим числом рекурсивных
     вызовов может привести к ошибке \textbf{переполнения стека}\footnotemark{}
     (stack overflow), потому что для каждого вызова функции на стеке аллоцируется память.
 
@@ -587,7 +590,7 @@ int main() {
     Функции с внешним связыванием можно вызывать из других единиц трансляции
     (если доступно их объявление).
     Функции с внутренним связыванием доступны только из той единицы трансляции,
-    в которой находится их опрделение.
+    в которой находится их определение.
 
     \hfill\break
     Есть два способа сделать связывание функции внутренним:
@@ -636,14 +639,14 @@ namespace {
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/inline}}
 
     \begin{itemize}
-        \item определение встраиваемой функции должно быть в той же единице
-            трансляции, где она вызывается;
+        \item чтобы встраивание было возможно, определение должно быть доступно
+            (видимо) в единице трансляции вызова;
         \item встраиваемые функции с внешним связыванием могут иметь более
             одного определения во всей программе и должны быть объявлены
             с \verb|inline| в каждой единице трансляции.
     \end{itemize}
 
-    Компилятор может, но не обязан, применить встраиваение\footnotemark{} такой
+    Компилятор может, но не обязан, применить встраивание\footnotemark{} такой
     функции в контекст вызова.
     Не рекомендуется делать встраиваемыми очень большие функции, поскольку это
     может привести к увеличению размера бинарного файла.
@@ -742,6 +745,7 @@ unsigned sum() {
 
     \begin{myinplacelisting}[minted language=cpp]
 unsigned get_from_user();
+// тело из предыдущего примера
 consteval unsigned factorial(const unsigned n) {/*...*/}
 
 unsigned sum() {
@@ -765,16 +769,19 @@ unsigned sum() {
 
     \begin{myinplacelisting}[minted language=cpp]
 void foo() {}
-int callback(int x, int y) { return 1; }
+int callback(int, int) { return 1; }
 
 void bar(int (*p)(int, int)) {
-    const int x = (*p)(1, 2); // calling function which p
-                              // points to
+    const int x = (*p)(1, 2); // calling the
+                              // function p points to
+    (void)x;
 }
 
 int main() {
     void (*pfoo)() = &foo; // pointer to function foo
     void (*pnull)() = nullptr; // null pointer to function
+    (void)pfoo;
+    (void)pnull;
     // pointer to function callback
     int (*pcallback)(int, int) = &callback;
     bar(pcallback);
@@ -803,6 +810,7 @@ void bar(t_pfunc p);
 int main() {
     t_pfunc pcallback = callback;
     t_pfunc pcallback0 = &callback; // same
+    (void)pcallback0;
     bar(pcallback);
 }
     \end{myinplacelisting}
@@ -848,6 +856,7 @@ int a(); int b(); int c();
 
 int main() {
     int (*arr0[])() = {a, b, c};
+    (void)arr0;
 
     using t_pfunc = int(*)();
     t_pfunc arr1[] = {a, b, c};
@@ -878,6 +887,7 @@ void bar(t_rfunc callback) {
 
 int main() {
     t_rfunc callback = foo;
+    bar(callback);
 }
     \end{myinplacelisting}
 

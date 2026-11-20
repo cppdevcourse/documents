@@ -175,7 +175,7 @@ f << 10; // compilation
 indirection-on-int.cpp: In function ‘int !\textcolor{teal}{main}!()’:
 indirection-on-int.cpp:5:18: !\color{red}{error}!: invalid type argument of unary ‘*’ (have ‘int’)
     5 |     std::cout << !\textcolor{red}{*i}! << std::cout;
-      |
+      |                  ^~
     \end{terminalwindow}
 
     Допустимость проведения операции над объектом проверяется во время
@@ -402,10 +402,10 @@ indirection-on-int.cpp:5:18: !\color{red}{error}!: invalid type argument of unar
             \verb|2E| & \verb|.|   & \verb|3E| & \verb|>|   &
             \verb|4E| & \verb|N|   & \verb|5E| & \verb|^|   &
             \verb|6E| & \verb|n|   & \verb|7E| & \verb|~|   \\
-            \verb|0E| & \verb|SI|  & \verb|1E| & \verb|US|  &
-            \verb|2E| & \verb|/|   & \verb|3E| & \verb|?|   &
-            \verb|4E| & \verb|O|   & \verb|5E| & \verb|_|   &
-            \verb|6E| & \verb|o|   & \verb|7E| & \verb|DEL| \\
+            \verb|0F| & \verb|SI|  & \verb|1F| & \verb|US|  &
+            \verb|2F| & \verb|/|   & \verb|3F| & \verb|?|   &
+            \verb|4F| & \verb|O|   & \verb|5F| & \verb|_|   &
+            \verb|6F| & \verb|o|   & \verb|7F| & \verb|DEL| \\
             \hline
         \end{tabular}
     \end{center}
@@ -582,7 +582,7 @@ this is tab     and this '
     \begin{center}
         \begin{tabular}{|c|c|}
             \hline
-            Количество бит & Диапазон значенией \\
+            Количество бит & Диапазон значений \\
             \hline
             \hline
             8 & \([0,255_{10}]\) \\
@@ -664,7 +664,7 @@ this is tab     and this '
     \begin{center}
         \begin{tabular}{|c|c|}
             \hline
-            Количество бит & Диапазон значенией \\
+            Количество бит & Диапазон значений \\
             \hline
             \hline
             8 & \([-128_{10},127_{10}]\) \\
@@ -971,7 +971,7 @@ u1 = u1 - 3;  // u1 = 255
         \cellcolor{red!40!white}{0} \\
     \end{sixteenbit}
 
-    Положительная бесконечость (\verb|-inf|):
+    Положительная бесконечность (\verb|+inf|):
 
     \begin{sixteenbit}
         \cellcolor{blue!40!white}{0} &
@@ -992,7 +992,7 @@ u1 = u1 - 3;  // u1 = 255
         \cellcolor{red!40!white}{0} \\
     \end{sixteenbit}
 
-    Отрицательная бесконечость (\verb|-inf|):
+    Отрицательная бесконечность (\verb|-inf|):
 
     \begin{sixteenbit}
         \cellcolor{blue!40!white}{1} &
@@ -1091,7 +1091,7 @@ u1 = u1 - 3;  // u1 = 255
 const.cpp: In function ‘int !\textcolor{teal}{main}!()’:
 const.cpp:3:7: !\textcolor{red}{error}!: assignment of read-only variable ‘i’
     3 |     !\textcolor{red}{i = 1}!;
-      |      !\textcolor{red}{~~\^{}~~}!
+      |     !\textcolor{red}{~~\^{}~~}!
     \end{terminalwindow}
 
 \end{frame}
@@ -1108,7 +1108,7 @@ const.cpp:3:7: !\textcolor{red}{error}!: assignment of read-only variable ‘i�
 
     Добавление \verb|volatile| к типу сообщает компилятору, что
     любое взаимодействие с переменной этого типа является
-    видимым изве программы. Компилятор, скорее всего, не
+    видимым извне программы. Компилятор, скорее всего, не
     будет оптимизировать код, связанный с такой переменной.
     Компилятор рассматривает \verb|volatile| типы как новые,
     т.е. \verb|volatile int != int|.

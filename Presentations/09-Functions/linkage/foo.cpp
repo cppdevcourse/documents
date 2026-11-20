@@ -1,7 +1,7 @@
 void foo1() {} // external linkage
 
-static void foo2() {} // internal linkage
+[[maybe_unused]] static void foo2() {} // internal linkage
 
 namespace {
-void foo3() {} // internal linkage
+[[maybe_unused]] void foo3() {} // internal linkage
 }
