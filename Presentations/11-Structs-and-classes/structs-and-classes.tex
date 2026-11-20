@@ -89,7 +89,7 @@ int main() {
 
     Перечисленные в определении структуры объекты называются ее
     \textbf{полями}\footnotemark{} (data members).
-    Полями структуры могут быть и объекты и других пользовательских типов.
+    Полями структуры могут быть и объекты, и других пользовательских типов.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/data\_members}}
 
@@ -133,8 +133,8 @@ ComplexNumber z6 = {.real=0.0, .imaginary=0.0}; // C++20
     \frametitle{Обращение к полям структуры}
 
     \hfill\break
-    Обращение на чтение или запись к отдельному полю структуры используется оператор
-    \textbf{member of object} (\verb|.|) для объектов и ссылок и оператор
+    Обращение на чтение или запись к отдельному полю структуры используется оператором
+    \textbf{member of object} (\verb|.|) для объектов и ссылок и оператором
     \textbf{member of pointer} (\verb|->|) для указателей\footnotemark{}.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/operator\_member\_access}}
@@ -167,9 +167,9 @@ struct S {
 
 int main() {
     S s; // ошибка компиляции
-    S s {0, 1};
-    ++s.a;
-    ++s.b; // ошибка компиляции
+    S s2 {0, 1};
+    ++s2.a;
+    ++s2.b; // ошибка компиляции
 }
     \end{myinplacelisting}
 
@@ -215,7 +215,7 @@ int main() {
 
     \frametitle{Выравнивание полей}
 
-    Размер структуры зависит от его суммы размеров её полей, но не обязательно равен ей
+    Размер структуры зависит от её суммы размеров её полей, но не обязательно равен ей
     \footnotemark{}.
 
     \begin{myinplacelisting}[minted language=cpp]
@@ -308,7 +308,7 @@ int main() {
 
     \frametitle{Статические поля}
 
-    Поле структуры может иметь статическое время хранения.
+    Поле структуры может иметь статическое время жизни.
 
     \begin{myinplacelisting}[minted language=cpp]
 #include <iostream>
@@ -338,7 +338,7 @@ int main() {
     \hfill\break
     Определение структуры может содержать функции, называемые
     \textbf{методами}\footnotemark{} (member functions).
-    Область видимости определений методов включает все поля структуры.
+    В телах методов видны все поля структуры.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/member\_functions}}
 
@@ -400,7 +400,7 @@ struct ComplexNumber {
     \hfill\break
     Метод может быть объявлен с квалификатором \verb|const|.
     В теле такого метода не может быть изменения полей структуры.
-    Методы без \verb|const| не могут быть вызваны у неконстантных объектов.
+    Методы без \verb|const| не могут быть вызваны у константных объектов.
 
     \begin{myinplacelisting}[minted language=cpp]
 #include <cmath>
@@ -441,7 +441,7 @@ struct ComplexNumber {
     double imaginary;
     ComplexNumber& Add(const ComplexNumber& o) {
         this->real += o.real;
-        this->imaginary += o.real;
+        this->imaginary += o.imaginary;
         return *this;
     }
 };
@@ -549,6 +549,24 @@ int main() {
 
 \begin{frame}[fragile]
 
+    \frametitle{Спецификаторы доступа (продолжение)}
+
+    Тело метода, определённого вне класса, может обращаться к
+    \verb|private|-полям класса (класс — из предыдущего примера).
+
+    \begin{myinplacelisting}[minted language=cpp]
+ComplexNumber& ComplexNumber::operator*=(
+        const double number) {
+    real *= number;
+    imaginary *= number;
+    return *this;
+}
+    \end{myinplacelisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+
     \frametitle{Классы и структуры}
 
     В классе все поля и методы по-умолчанию \verb|private|, а в структуре
@@ -599,8 +617,8 @@ public:
     \frametitle{Конструктор и деструктор}
 
     Специальные методы, отвечающие за создание и уничтожение объектов, называются
-    \textbf{конструктор} (конструктор)\footnote{\url{https://en.cppreference.com/w/cpp/language/constructor}}
-    и \textbf{деструктор} (деструктор)\footnote{\url{https://en.cppreference.com/w/cpp/language/destructor}}.
+    \textbf{конструктором} (конструктор)\footnote{\url{https://en.cppreference.com/w/cpp/language/constructor}}
+    и \textbf{деструктором} (деструктор)\footnote{\url{https://en.cppreference.com/w/cpp/language/destructor}}.
 
     Эти методы вызываются автоматически в моменты начала и конца времени жизни объекта.
 
@@ -719,6 +737,9 @@ private:
     объекта соответственно.
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <iostream>
+#include <cstdlib>
+
 struct Foo {
     Foo() : a(-100) {}
     int a;
@@ -747,12 +768,16 @@ int main() {
     и методов при помощи ключевого слова \texttt{delete}.
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <cstddef>
+
 struct Foo {
     Foo(int) = delete;
     Foo(long long);
     Foo& operator=(const Foo& o) = delete;
     void* operator new(std::size_t) = delete;
 };
+
+Foo::Foo(const long long) {}
 
 int main() {
     Foo f0 {1}; // compilation error
@@ -769,7 +794,7 @@ int main() {
     \frametitle{Специальные методы}
 
     Следующие методы называются \textit{специальными} и могут быть
-    быть сгенерированы компилятором, если их не предоставил пользователь.
+    сгенерированы компилятором, если их не предоставил пользователь.
 
     \hfill \break
 
@@ -822,6 +847,8 @@ int main() {
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/move\_constructor.html}}
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <vector>
+#include <utility>
 struct Foo {
     Foo() : ptr(new int[1024]) {}
     ~Foo() { if (ptr) delete[] ptr; }
@@ -890,7 +917,7 @@ struct Foo {
             if (ptr) {
                 delete ptr;
             }
-            ptr = new int[1024];
+            ptr = new int;
             *ptr = *o.ptr;
         }
         return *this;
@@ -1002,7 +1029,7 @@ int main() {
 
     \frametitle{Правило трех}
 
-    Если в классе потребовалось определить \textit{конструктор по-умолчанию},
+    Если в классе потребовалось определить \textit{конструктор копирования},
     \textit{copy assignment operator} или \textit{деструктор} с непустым телом, то,
     вероятнее всего, требуется определить все три этих специальных метода.
 

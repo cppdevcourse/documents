@@ -81,8 +81,8 @@ const short* p = &s;
                 \node[bytenode]                 (addr14)    [above=-\pgflinewidth of addr13]    {\verb|0x7fffffffe431|};
                 \node[bytenode]                 (addr15)    [above=-\pgflinewidth of addr14]    {\verb|0x7fffffffe430|};
 
-                \node[bytenode, draw, fill=green!20]    (b0)    [right=1mm of addr0]    {\verb|0x11|};
-                \node[bytenode, draw, fill=green!20]    (b1)    [right=1mm of addr1]    {\verb|0x22|};
+                \node[bytenode, draw, fill=green!20]    (b0)    [right=1mm of addr0]    {\verb|0x22|};
+                \node[bytenode, draw, fill=green!20]    (b1)    [right=1mm of addr1]    {\verb|0x11|};
                 \node[bytenode, draw]                   (b2)    [right=1mm of addr2]    {};
                 \node[bytenode, draw]                   (b3)    [right=1mm of addr3]    {};
                 \node[bytenode, draw]                   (b4)    [right=1mm of addr4]    {};
@@ -96,7 +96,7 @@ const short* p = &s;
                 \node[bytenode, draw, fill=yellow!20]   (b12)   [right=1mm of addr12]   {\verb|0xff|};
                 \node[bytenode, draw, fill=yellow!20]   (b13)   [right=1mm of addr13]   {\verb|0xff|};
                 \node[bytenode, draw, fill=yellow!20]   (b14)   [right=1mm of addr14]   {\verb|0xe4|};
-                \node[bytenode, draw, fill=yellow!20]   (b15)   [right=1mm of addr15]   {\verb|0x3e|};
+                \node[bytenode, draw, fill=yellow!20]   (b15)   [right=1mm of addr15]   {\verb|0x3f|};
 
             \end{tikzpicture}
 
@@ -310,7 +310,7 @@ p = &b; // compilation error
     \frametitle{Константные указатели и \\ указатели на константные объекты}
 
     \begin{task}
-        Найдите ошибки компиляциии в коде на листингах ниже.
+        Найдите ошибки компиляции в коде на листингах ниже.
     \end{task}
 
     \begin{columns}[T]
@@ -341,7 +341,7 @@ int main() {
 int main() {
     int a {};
     const int* const p = &a;
-    int* const* const pp = &p;
+    const int* const* const pp = &p;
     **pp = -1;
     std::cout << a
         << std::endl;
@@ -360,7 +360,7 @@ int main() {
 
     \hfill \break
 
-    Указатели каждого типа имеют специaльное значение, называемое
+    Указатели каждого типа имеют специальное значение, называемое
     \textbf{нулевым указателем}.
     Обычно при помощи нулевого указателя выражают отсутствие какого-либо
     значения или состояние ошибки.
@@ -372,7 +372,7 @@ int main() {
 
     \begin{myinplacelisting}[minted language=cpp]
 const int* pi {};
-const char* const pc { nullptr; }
+const char* const pc { nullptr };
 double* pd = 0;
     \end{myinplacelisting}
 
@@ -393,9 +393,9 @@ if (!p) {
 
     \frametitle{Нулевой указатель}
 
-    Разыменование указателя для чтения или записи является неопределенным
-    поведением и приведет к аварийному завершению работы программы на
-    большинстве платформ
+    Разыменование \textbf{нулевого} указателя для чтения или записи является
+    неопределенным поведением и приведет к аварийному завершению работы
+    программы на большинстве платформ
     \footnote{\url{https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines\#es65-dont-dereference-an-invalid-pointer}}.
 
     \myinputlisting[minted language=cpp]
@@ -422,7 +422,7 @@ Segmentation fault (core dumped)
     \begin{terminalwindow}
 !\shellcommand{g++ main.cpp -o main}!
 !\shellcommand{./main}!
-'MY_ENV_VAR' is not defined
+'MY_ENV_VAR' not defined
 !\shellcommand{MY\_ENV\_VAR="hello" ./main}!
 'MY_ENV_VAR'=hello
     \end{terminalwindow}
@@ -485,7 +485,7 @@ p = 0x7ffd6cd3aa20, (p + 1) = 0x7ffd6cd3aa28
 
     \frametitle{Арифметика указателей}
 
-    Арифметика указателей неприменима к указателю типа \verb|void|!
+    Арифметика указателей неприменима к указателю типа \verb|void*|!
 
     \myinputlisting[minted language=cpp]
         {Presentations/07-Pointers-and-References/void-ptr/}
@@ -507,7 +507,7 @@ main.cpp:3:5: !\textcolor{orange}{warning}!: ISO C++ forbids incrementing a poin
 
     Указатели, ссылающиеся на объекты с истекшим временем жизни,
     называются \textbf{висячими} (dangling).
-    Чтение и запись памяти, на которую они ссылаются, является неопределенным
+    Чтение и запись памяти, на которую они ссылаются, являются неопределенным
     поведением
     \footnote{\url{https://github.com/Nekrolm/ubbook/blob/master/lifetime/use\_after\_free\_in\_general.md}}.
 
@@ -535,7 +535,7 @@ int main() {
     В отличие от нулевого указателя, отличить висячий указатель от
     \enquote{корректного} практически невозможно.
     Рекомендуется записывать \verb|nullptr| в указатель, который ссылается
-    на объект с истекшим времени жизни.
+    на объект с истекшим временем жизни.
     Это может помочь избежать уязвимости use-after-free
     \footnote{\url{https://owasp.org/www-community/vulnerabilities/Using\_freed\_memory}}.
 
@@ -584,12 +584,12 @@ int main() {
 
 \begin{frame}[fragile]
 
-    \frametitle{Инициализация и разыменование ссылок}
+    \frametitle{Инициализация ссылок}
 
     \hfill \break
 
     Ниже приведены корректные и некорректные примеры инициализации
-    и разыменования ссылок.
+    ссылок.
 
     \begin{myinplacelisting}[minted language=cpp]
 #include <iostream>
@@ -605,8 +605,8 @@ int main() {
 
     const int y {};
     int& ry { y }; // compilation error
-    const int& ry { y }; // ok, ry points to y
-    ry = -1; // compilation error
+    const int& ryy { y }; // ok, ryy points to y
+    ryy = -1; // compilation error
 }
     \end{myinplacelisting}
 

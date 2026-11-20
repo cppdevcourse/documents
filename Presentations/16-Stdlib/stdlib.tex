@@ -39,7 +39,7 @@
       \item средства управления памятью;
       \item структуры данных и алгоритмы для работы с ними;
       \item средства для ввода/вывода;
-      \item подмножество часто использумых математических операций;
+      \item подмножество часто используемых математических операций;
       \item средства для работы с файловыми системами;
       \item run-time type information (RTTI)\footnote{\url{https://en.cppreference.com/w/cpp/utility/rtti.html}};
       \item средства для параллельных вычислений (на основе потоков или lock-free);
@@ -51,7 +51,7 @@
 
   \begin{frame}[fragile]
 
-    \frametitle{Исполнение стандартной библиотеки}
+    \frametitle{Реализация стандартной библиотеки}
 
     Стандартная библиотека состоит из:
     \hfill \break
@@ -97,7 +97,7 @@ collect2: error: ld returned 1 exit status
     В большинстве случаев отключать линковку со стандартной библиотекой не требуется.
     Если программа не использует стандартную библиотеку,
     то на размер файла это не повлияет.
-    Но может быть важно скомпилировать программу так, чтобы в его динамической
+    Но может быть важно скомпилировать программу так, чтобы в её динамической
     секции не было стандартной библиотеки.
 
     \begin{mytitledinplacelisting}[minted language=cpp]{main.cpp}
@@ -355,7 +355,7 @@ int main() {
 
     \frametitle{Псевдонимы типов \texttt{std::array}}
 
-    В шаблонах-контейнеров обычно определен набор из псевдонимов.
+    В шаблонах-контейнерах обычно определён набор псевдонимов.
 
     \begin{mycppinplacelisting}
 #include <array>
@@ -374,7 +374,7 @@ int main() {
 
     \frametitle{Range-based цикл \texttt{for} и контейнеры}
 
-    Совместно STL контейнерами можно использовать вариацию циклa \texttt{for},
+    Совместно STL контейнерами можно использовать вариацию цикла \texttt{for},
     которая называется \textit{range-based for loop}\footnotemark{}.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/range-for.html}}
@@ -500,7 +500,7 @@ int main() {
     \end{itemize}
     \hfill \break
 
-    Управление ёмкостью вектор происходит в полуавтоматическом режиме:
+    Управление ёмкостью вектора происходит в полуавтоматическом режиме:
     некоторые методы приводят к изменению ёмкости косвенно,
     некоторые \textemdash \space напрямую.
 
@@ -518,7 +518,10 @@ int main() {
     но не обязательно на размер его элемента.
     При удалении элемента из массива ёмкость не уменьшается.
 
-    \begin{mycppinplacelisting}
+    \begin{mycppinplacelisting}[after skip=0mm]
+#include <print>
+#include <vector>
+
 int main() {
     std::vector<int> v {};
     std::println("size: {}, capacity: {}",
@@ -573,7 +576,7 @@ size: 0, capacity: 8
 #include <print>
 #include <vector>
 
-bool condition();
+bool condition() { return true; }
 
 int main() {
     std::vector<int> v {};
@@ -605,6 +608,9 @@ int main() {
     \footnotetext{Определение итератора дается позднее.}
 
     \begin{mycppinplacelisting}
+#include <print>
+#include <vector>
+
 using Vector = std::vector<int>;
 
 void print(const Vector& v) {
@@ -666,7 +672,7 @@ struct Pirate {
         std::println("Move {}", name);
     }
     Pirate& operator=(Pirate&& o) noexcept {
-        std::println("{} move assignment", name);
+        std::println("{} move assignment", o.name);
         // ...
     }
     std::string name;
@@ -702,7 +708,7 @@ int main() {
     \frametitle{Время жизни элементов \texttt{std::vector}}
 
     Если конструктор перемещения не объявлен \texttt{noexcept},
-    то компилятор будет по-умолчанию использовать копирование
+    то компилятор будет по умолчанию использовать копирование
     при изменении размера вектора.
 
     \begin{mycppinplacelisting}
@@ -930,10 +936,10 @@ Move Joshamee
 
     Для \texttt{std::vector} определена частичная специализация
     для типа \texttt{bool}.
-    В этой специализации каждый элемент занимает ровно один байт.
+    В этой специализации каждый элемент занимает ровно один бит.
 
     \hfill \break
-    Многими эта специализация рассматривается как архитектурная ошибка
+    Эта специализация рассматривается многими как архитектурная ошибка
     в стандарте.
 
     \begin{mycppinplacelisting}
@@ -1017,7 +1023,7 @@ Move Hector
     \enquote{Уникальность} значений в \texttt{std::set} проверяется оператором
     \texttt{<} (\enquote{меньше}).
     Для двух элементов \texttt{std::set} $a$ и $b$ никогда не должно быть
-    истонно выражение:
+    истинно выражение:
 
     \begin{equation*}
       \neg \left(a < b\right) \land \neg \left(b < a\right)
@@ -1036,6 +1042,10 @@ Move Hector
     \frametitle{Сортировка в \texttt{std::set}}
 
     \begin{mycppinplacelisting}
+#include <print>
+#include <set>
+#include <string>
+
 struct Pirate {
     std::string name;
     bool operator<(const Pirate& o) const noexcept {
@@ -1053,6 +1063,14 @@ int main() {
     std::println();
 }
     \end{mycppinplacelisting}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Сортировка в \texttt{std::set}}
+
+    Вывод программы с листинга на прошлом слайде:
 
     \begin{terminalwindow}
 !\shellcommand{c++ -std=c++23 main.cpp -o main \&\& ./main}!
@@ -1152,8 +1170,8 @@ Davy Jack
 
     Для хранения упорядоченных неуникальных элементов можно
     использовать \texttt{std::multiset}\footnotemark{}.
-    По реализации (красно-черное дерево) и интерфейсу
-    (наборму методов) он почти идентичен \texttt{std::set}.
+    По реализации (красно-черное дерево) и набору
+    методов он почти идентичен \texttt{std::set}.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/container/multiset.html}}
 
@@ -1224,13 +1242,16 @@ std::println("{} has ID=11", users[11]);
 struct User {
     std::string name;
     std::string surname;
+    bool operator==(const User& user) const {
+        return name == user.name && surname == user.surname;
+    }
 };
     \end{mycppinplacelisting}
 
     Зададимся целью иметь возможность создавать хэш-таблицы,
     в которых пользователи будут ключами:
 
-    \begin{mycppinplacelisting}
+    \begin{mycppinplacelisting}[after skip=0mm]
 std::unordered_set<User> users {
     {"Sean", "Bean"},
     {"Alfie", "Allen"}
@@ -1252,7 +1273,7 @@ std::unordered_map<User, IllegallyCollectedPersonalData> {
     В общем случае для этого можно написать отдельный класс и передать
     его в параметры шаблона, но в данном примере используется
     специализация класса \texttt{std::hash}, которая является
-    аргументом шаблона по-умолчанию.
+    аргументом шаблона по умолчанию.
 
     \begin{mycppinplacelisting}
 template<>
@@ -1279,7 +1300,7 @@ struct std::hash<User> {
 
     \frametitle{Хэш-таблицы}
 
-    Чуть более лучшим, но все еще не идеальным, будет
+    Чуть лучшим, но всё ещё не идеальным, будет
     вычисление хэшей полей класса при помощи \texttt{std::hash}
     и применение исключающего \enquote{ИЛИ}.
 
@@ -1327,7 +1348,7 @@ std::println("{}", hash({"Sean", "Bean"}));
     \frametitle{Хэш-таблицы}
 
     Для вычисления слота на основе хэша используется
-    остаток деления на общее числo слотов.
+    остаток деления на общее число слотов.
 
     \begin{mycppinplacelisting}
 const User sean {"Sean", "Bean"};
@@ -1338,9 +1359,9 @@ std::hash<User> hash {};
 std::unordered_set<User> users {sean, alfie};
 
 std::println("Buckets count: {}", users.bucket_count()); // 13
-std::println("Alfie's bucket: {}", users.bucket(alfie)); // 10
+std::println("Alfie's bucket: {}", users.bucket(alfie)); // 12
 std::println("Computed bucket: {}",
-  hash(alfie) % users.bucket_count()); // 10
+  hash(alfie) % users.bucket_count()); // 12
     \end{mycppinplacelisting}
 
   \end{frame}
@@ -1357,7 +1378,7 @@ std::println("Computed bucket: {}",
     \footnotetext{\url{https://en.wikipedia.org/wiki/Hash\_collision}}
 
     \hfill \break
-    Пример чуть более, чем неидеальной, хэш-функции:
+    Пример неидеальной хэш-функции:
 
     \begin{mycppinplacelisting}
 template<>
@@ -1430,7 +1451,17 @@ struct User {
     с наборами данных (например, контейнерами из STL) разных типов
     единообразным способом.
 
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Итераторы}
+
     \begin{mycppinplacelisting}
+#include <array>
+#include <print>
+#include <set>
+
 template <class C>
 void print_backward(const C& c) {
     for (auto it = c.crbegin(); it != c.crend(); ++it) {
@@ -1456,10 +1487,19 @@ int main() {
 
     \frametitle{Итераторы}
 
-    Другим назначение операторов является обощением работы
+    Другое назначение операторов — обобщение работы
     над подмножеством элементов в контейнере.
 
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Итераторы}
+
     \begin{mycppinplacelisting}
+#include <print>
+#include <vector>
+
 template <std::forward_iterator It>
 It::value_type sum(It beg, It end) {
     typename It::value_type value {};
@@ -1549,7 +1589,7 @@ std::cend(v);
     \frametitle{Разыменование \texttt{end} итераторов}
 
     Как и в случае с обычными указателями, разрешается создавать
-    итераторы, указывающий на следующий после последнего элемент
+    итераторы, указывающие на следующий после последнего элемент
     последовательности.
 
     \begin{mycppinplacelisting}

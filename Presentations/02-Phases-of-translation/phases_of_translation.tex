@@ -32,9 +32,9 @@
 
         \item \textbf{Preprocessing (препроцессор)}
 
-        \item Determining common string literal encodings
-
         \item Concatenating string literals
+
+        \item Forming tokens
 
         \item \textbf{Compiling (компиляция)}
 
@@ -60,7 +60,7 @@
 
         \item \texttt{\textbf{g++}} от GNU Compiler Collection (GCC)
 
-        \item \texttt{\textbf{clang++}} от от Low Level Virtual Machine (LLVM)
+        \item \texttt{\textbf{clang++}} от Low Level Virtual Machine (LLVM)
 
         \item Microsoft Visual C++ (MSVC)
 
@@ -194,7 +194,7 @@ int main() {
 
 int main() {
     int b = a;
-    return 0;
+    return b;
 }
             \end{terminalwindow}
 
@@ -510,7 +510,7 @@ a.out: ELF |\colorbox{green}{64-bit}| LSB executable, |\colorbox{green}{x86-64}|
 
 \begin{frame}[fragile]
 
-    \frametitle{Статичеcкая библиотека}
+    \frametitle{Статическая библиотека}
 
     \begin{columns}[T]
 
@@ -736,7 +736,7 @@ OFFSET           TYPE              VALUE
     \end{terminalwindow}
 
     Первый \texttt{00} байт в инструкции \texttt{call} имеет адрес \texttt{5}
-    (\texttt{4}-ый адрес занимает opcode инструкции).
+    (opcode инструкции \texttt{call} находится по адресу \texttt{4}).
 
 \end{frame}
 
@@ -744,7 +744,7 @@ OFFSET           TYPE              VALUE
 
     \frametitle{Релокации}
 
-    На этапе линковки компилятор, используя таблицы релокаций, заполнит
+    На этапе линковки компоновщик, используя таблицы релокаций, заполнит
     все нулевые адреса.
 
     \begin{columns}[T]

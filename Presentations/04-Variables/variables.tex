@@ -38,10 +38,10 @@ MyCustomType var;
 
     \begin{itemize}
 
-        \item Первым символом идентификатора могут быть \verb|a-Z| или \verb|_|.
+        \item Первым символом идентификатора могут быть \verb|a-z|, \verb|A-Z| или \verb|_|.
 
-        \item Остальные символы идентификатора могут быть \verb|a-Z|,
-            \verb|0-9| или \verb|_|.
+        \item Остальные символы идентификатора могут быть \verb|a-z|,
+            \verb|A-Z|, \verb|0-9| или \verb|_|.
 
         \item Идентификатор не должен совпадать с ключевым словом языка,
             например, \verb|int| или \verb|for|
@@ -49,7 +49,7 @@ MyCustomType var;
                 \url{https://en.cppreference.com/w/cpp/keyword}}.
 
         \item Идентификаторы регистрозависимы: \verb|var| и \verb|Var| ---
-            различные имена переменнных.
+            различные имена переменных.
 
     \end{itemize}
 
@@ -114,7 +114,7 @@ float f(3.14);
     \begin{terminalwindow}
         !\shellcommand{g++ \colorbox{yellow}{-Wall} uninit.cpp}!
 uninit.cpp: In function ‘int !\textcolor{teal}{main}!()’:
-unint.cpp:5:18: !\textcolor{orange}{warning:}! ‘i’ is used uninitialized [!\textcolor{orange}{-Wuninitialized}!]
+uninit.cpp:5:18: !\textcolor{orange}{warning:}! ‘i’ is used uninitialized [!\textcolor{orange}{-Wuninitialized}!]
     5 |     std::cout << !\textcolor{orange}{i}! << std::endl;
       |                  !\textcolor{orange}{\^{}}!
 uninit.cpp:4:9: !\textcolor{cyan}{note}!: ‘i’ was declared here
@@ -152,13 +152,15 @@ uninit-const.cpp:2:15: !\textcolor{red}{error:}! uninitialized ‘const i’ [!\
             \url{https://en.cppreference.com/w/cpp/language/operator\_assignment}}.
 
     \begin{myinplacelisting}[minted language=cpp]
-int i = 0;  // initialization, not assignment
-i = 1;      // simple assignment
-i += 2;     // addition assignment
-i *= 3;     // multiplication assignment
+int main() {
+    int i = 0;  // initialization, not assignment
+    i = 1;      // simple assignment
+    i += 2;     // addition assignment
+    i *= 3;     // multiplication assignment
 
-const char c = 'c';
-c = 'd';    // compilation error
+    const char c = 'c';
+    c = 'd';    // compilation error
+}
     \end{myinplacelisting}
 
 \end{frame}
@@ -291,7 +293,7 @@ X::s; // ok
         \begin{column}{0.5\textwidth}
 
             \begin{myinplacelisting}[minted language=cpp]
-{
+void foo() {
     const bool b = true;
     {
         {
@@ -314,8 +316,10 @@ namespace X {
     }
 }
 
-X::a;
-X::Y::a;
+void foo() {
+    X::a;
+    X::Y::a;
+}
             \end{myinplacelisting}
 
         \end{column}
@@ -376,12 +380,14 @@ same-identifier.cpp:3:13: !\textcolor{cyan}{note}!: previous declaration as ‘i
     Automatic storage duration:
 
     \begin{myinplacelisting}[minted language=cpp]
-{
-    char c0 = {}; // <- c0's lifetime begins
+void f() {
     {
-        char c1 = {}; // <- c1's lifetime begins
-    } // <- c1's lifetime ends
-} // <- c0's lifetime ends
+        char c0 = {}; // <- c0's lifetime begins
+        {
+            char c1 = {}; // <- c1's lifetime begins
+        } // <- c1's lifetime ends
+    } // <- c0's lifetime ends
+}
     \end{myinplacelisting}
 
     Чаще всего автоматическое время хранения в памяти реализовано через
@@ -407,12 +413,12 @@ same-identifier.cpp:3:13: !\textcolor{cyan}{note}!: previous declaration as ‘i
 
         \node[bytenode, draw, fill=green!10]    (bn00) [right=1mm of addr0]             {};
         \node[bytenode, draw, fill=green!10]    (bn01) [right=1mm of bn00]              {};
-        \node[bytenode, draw, fill=yellow!10]   (bn11) [above=-\pgflinewidth of bn01]   {\verb|c0|};
+        \node[bytenode, draw, fill=green!10]    (bn11) [above=-\pgflinewidth of bn01]   {};
         \node[bytenode, draw, fill=green!10]    (bn02) [right=1mm of bn01]              {};
         \node[bytenode, draw, fill=yellow!10]   (bn12) [above=-\pgflinewidth of bn02]   {\verb|c0|};
         \node[bytenode, draw, fill=red!10]      (bn22) [above=-\pgflinewidth of bn12]   {\verb|c1|};
         \node[bytenode, draw, fill=green!10]    (bn03) [right=1mm of bn02]              {};
-        \node[bytenode, draw, fill=yellow!10]   (bn13) [above=-\pgflinewidth of bn03]   {\verb|c0|};
+        \node[bytenode, draw, fill=green!10]    (bn13) [above=-\pgflinewidth of bn03]   {};
         \node[bytenode, draw, fill=green!10]    (bn04) [right=1mm of bn03]              {};
 
     \end{tikzpicture}
@@ -426,10 +432,12 @@ same-identifier.cpp:3:13: !\textcolor{cyan}{note}!: previous declaration as ‘i
     Dynamic storage duration:
 
     \begin{myinplacelisting}[minted language=cpp]
-int* i = new int(0);        // <- i's lifetime begins
-float* f = new float(0.0);  // <- f's lifetime begins
-delete i;                   // <- i's lifetime ands
-delete f;                   // <- f's lifetime ends
+void foo() {
+    int* i = new int(0);        // <- i's lifetime begins
+    float* f = new float(0.0);  // <- f's lifetime begins
+    delete i;                   // <- i's lifetime ends
+    delete f;                   // <- f's lifetime ends
+}
     \end{myinplacelisting}
 
     Область оперативной памяти программы, в которой хранятся объекты

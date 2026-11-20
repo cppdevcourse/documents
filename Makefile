@@ -83,7 +83,7 @@ help:
 	@printf "pr-03\tbuild presentation pr-03.pdf\n"
 	@printf "pr-04\tbuild presentation pr-04.pdf\n"
 	@printf "pr-05\tbuild presentation pr-05.pdf\n"
-	@printf "pr-06\tbuild presentation pr-05.pdf\n"
+	@printf "pr-06\tbuild presentation pr-06.pdf\n"
 	@printf "pr-07\tbuild presentation pr-07.pdf\n"
 	@printf "pr-08\tbuild presentation pr-08.pdf\n"
 	@printf "pr-09\tbuild presentation pr-09.pdf\n"
@@ -116,12 +116,36 @@ pr-16: pr-16.pdf
 pr-17: pr-17.pdf
 pr-19: pr-19.pdf
 
+# Кодовые файлы листингов (minted) — рекурсивно до 3 уровней вложенности;
+# GNU make не поддерживает рекурсивные wildcard, поэтому уровни расписаны явно.
+define pdf_deps
+	$(wildcard Presentations/$1/*.cpp) \
+	$(wildcard Presentations/$1/*.h) \
+	$(wildcard Presentations/$1/*.hpp) \
+	$(wildcard Presentations/$1/*/*.cpp) \
+	$(wildcard Presentations/$1/*/*.h) \
+	$(wildcard Presentations/$1/*/*.hpp) \
+	$(wildcard Presentations/$1/*/*/*.cpp) \
+	$(wildcard Presentations/$1/*/*/*.h) \
+	$(wildcard Presentations/$1/*/*/*.hpp)
+endef
+
+# latexmk сам не отслеживает файлы кода, подключаемые через minted (знает
+# только .tex/.sty, которые сам парсит): если какой-либо из исходников
+# новее собранного PDF — удаляем PDF, чтобы latexmk пересобрал его,
+# иначе latexmk ответит "up to date" и останется stale-PDF.
 define generate_pdf
+	@for f in $^; do \
+		if [ -f "$$f" ] && [ "$$f" -nt $(BUILD_DIR)/$@ ]; then \
+			rm -f $(BUILD_DIR)/$@; \
+			break; \
+		fi; \
+	done; \
 	TEXINPUTS='$(shell pwd)//:' \
 	SOURCE_DATE_EPOCH='$(shell date +%s)' \
 	latexmk \
 		-lualatex \
-		-jobname=$(subst .pdf,,$2) \
+		-jobname=$(subst .pdf,,$@) \
 		$1
 endef
 
@@ -131,178 +155,162 @@ pr-01.pdf: \
 	Presentations/images/binary-file.png \
 	Presentations/images/source_code.png \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/01-Intro/*.cpp) \
-	$(wildcard Presentations/01-Intro/*.h) \
+	$(call pdf_deps,01-Intro) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/01-Intro/intro.tex)
 
 pr-02.pdf: \
 	Presentations/02-Phases-of-translation/phases_of_translation.tex \
 	Presentations/presentationtemplate.sty \
+	Presentations/images/binary-file.png \
+	Presentations/images/source_code.png \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/02-Phases-of-translation/library/*.cpp) \
-	$(wildcard Presentations/02-Phases-of-translation/relocations/*.cpp) \
-	$(wildcard Presentations/02-Phases-of-translation/*.cpp) \
-	$(wildcard Presentations/02-Phases-of-translation/*.h) \
+	$(call pdf_deps,02-Phases-of-translation) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/02-Phases-of-translation/phases_of_translation.tex)
 
 pr-03.pdf: \
 	Presentations/03-Fundamental-types/fundamental_types.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/03-Fundamental-types/*.cpp) \
+	$(call pdf_deps,03-Fundamental-types) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/03-Fundamental-types/fundamental_types.tex)
 
 pr-04.pdf: \
 	Presentations/04-Variables/variables.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/04-Variables/*.cpp) \
-	$(wildcard Presentations/04-Variables/*.h) \
-	$(wildcard Presentations/04-Variables/**/*.cpp) \
-	$(wildcard Presentations/04-Variables/**/*.h) \
+	$(call pdf_deps,04-Variables) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/04-Variables/variables.tex)
 
 pr-05.pdf: \
 	Presentations/05-Selection-statements/selection-statements.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/05-Selection-statements/*.cpp) \
-	$(wildcard Presentations/05-Selection-statements/*.h) \
-	$(wildcard Presentations/05-Selection-statements/**/*.cpp) \
-	$(wildcard Presentations/05-Selection-statements/**/*.h) \
+	$(call pdf_deps,05-Selection-statements) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/05-Selection-statements/selection-statements.tex)
 
 pr-06.pdf: \
 	Presentations/06-Iteration-statements/iteration-statements.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/06-Iteration-statements/*.cpp) \
-	$(wildcard Presentations/06-Iteration-statements/*.h) \
-	$(wildcard Presentations/06-Iteration-statements/**/*.cpp) \
-	$(wildcard Presentations/06-Iteration-statements/**/*.h) \
+	$(call pdf_deps,06-Iteration-statements) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/06-Iteration-statements/iteration-statements.tex)
 
 pr-07.pdf: \
 	Presentations/07-Pointers-and-References/ptrs-and-refs.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/07-Pointers-and-References/*.cpp) \
-	$(wildcard Presentations/07-Pointers-and-References/*.h) \
-	$(wildcard Presentations/07-Pointers-and-References/**/*.cpp) \
-	$(wildcard Presentations/07-Pointers-and-References/**/*.h) \
+	$(call pdf_deps,07-Pointers-and-References) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/07-Pointers-and-References/ptrs-and-refs.tex)
 
 pr-08.pdf: \
 	Presentations/08-Arrays/arrays.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/08-Arrays/*.cpp) \
-	$(wildcard Presentations/08-Arrays/*.h) \
-	$(wildcard Presentations/08-Arrays/**/*.cpp) \
-	$(wildcard Presentations/08-Arrays/**/*.h) \
+	$(call pdf_deps,08-Arrays) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/08-Arrays/arrays.tex)
 
 pr-09.pdf: \
 	Presentations/09-Functions/functions.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/09-Functions/*.cpp) \
-	$(wildcard Presentations/09-Functions/*.h) \
-	$(wildcard Presentations/09-Functions/**/*.cpp) \
-	$(wildcard Presentations/09-Functions/**/*.h) \
+	$(call pdf_deps,09-Functions) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/09-Functions/functions.tex)
 
 pr-10.pdf: \
 	Presentations/10-Conversions/conversions.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/10-Conversions/*.cpp) \
-	$(wildcard Presentations/10-Conversions/*.h) \
-	$(wildcard Presentations/10-Conversions/**/*.cpp) \
-	$(wildcard Presentations/10-Conversions/**/*.h) \
+	$(call pdf_deps,10-Conversions) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/10-Conversions/conversions.tex)
 
 pr-11.pdf: \
 	Presentations/11-Structs-and-classes/structs-and-classes.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,11-Structs-and-classes) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/11-Structs-and-classes/structs-and-classes.tex)
 
 pr-12.pdf: \
 	Presentations/12-Inheritance/inheritance.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/12-Inheritance/*.cpp) \
-	$(wildcard Presentations/12-Inheritance/*.h) \
+	$(call pdf_deps,12-Inheritance) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/12-Inheritance/inheritance.tex)
 
 pr-13.pdf: \
 	Presentations/13-Exceptions/exceptions.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,13-Exceptions) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/13-Exceptions/exceptions.tex)
 
 pr-14.pdf: \
 	Presentations/14-Virtual-members/virtual-members.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,14-Virtual-members) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/14-Virtual-members/virtual-members.tex)
 
 pr-15.pdf: \
 	Presentations/15-Templates/templates.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,15-Templates) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/15-Templates/templates.tex)
 
 pr-16.pdf: \
 	Presentations/16-Stdlib/stdlib.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	$(call pdf_deps,16-Stdlib) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/16-Stdlib/stdlib.tex)
 
 pr-17.pdf: \
 	Presentations/17-streams/streams.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/17-streams/*.cpp) \
-	$(wildcard Presentations/17-streams/*.h) \
-	$(wildcard Presentations/17-streams/**/*.cpp) \
-	$(wildcard Presentations/17-streams/**/*.h)
-	$(call generate_pdf,$<,$@)
+	$(call pdf_deps,17-streams) \
+	Packages/terminal.sty \
+	Packages/mylisting.sty
+	$(call generate_pdf,Presentations/17-streams/streams.tex)
 
 pr-19.pdf: \
 	Presentations/19-algorithms/algorithms.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
-	$(wildcard Presentations/19-algorithms/*.cpp) \
-	$(wildcard Presentations/19-algorithms/*.h) \
+	$(call pdf_deps,19-algorithms) \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
-	$(call generate_pdf,$<,$@)
+	$(call generate_pdf,Presentations/19-algorithms/algorithms.tex)

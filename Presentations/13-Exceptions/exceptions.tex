@@ -93,7 +93,7 @@ int main() {
     \frametitle{Ошибка в возвращаемом значении}
 
     \textbf{Вариант 1} \textemdash \space в возвращаемом значении код ошибки,
-    а результаты выполнения передается по ссылке.
+    а результат выполнения передается по ссылке.
 
     \begin{myinplacelisting}[minted language=cpp]
 enum class Result {
@@ -118,7 +118,7 @@ Result foo(unsigned i, int& result) {
     \frametitle{Ошибка в возвращаемом значении}
 
     \textbf{Вариант 1} \textemdash \space в возвращаемом значении код ошибки,
-    а результаты выполнения передается по ссылке.
+    а результат выполнения передается по ссылке.
 
     \begin{myinplacelisting}[minted language=cpp]
 unsigned get_index();
@@ -131,6 +131,7 @@ int main() {
             break;
         case Result::OUT_OF_RANGE:
             std::println(stderr, "Error: out of bounds");
+            break;
         default:
             std::println(stderr, "Error: unknown");
             break;
@@ -170,7 +171,7 @@ struct Result {
 Result foo(unsigned i) {
     constexpr int arr[] = {1, 2, 3};
     if (i > 2) {
-        return {Result::Error::OUT_OF_RANGE};
+        return {Result::Error::OUT_OF_RANGE, 0};
     }
     Result result {};
     result.value = arr[i];
@@ -272,7 +273,7 @@ void foo(const Month& month) {
     \frametitle{Unrepresentable state}
 
     Как правило, лучше вообще не давать создавать объект с
-    неконсистентным состояним, делая его таким образом
+    неконсистентным состоянием, делая его таким образом
     \enquote{непредставимым} (\textit{unrepresentable state}).
 
     \begin{myinplacelisting}[minted language=cpp]
@@ -282,7 +283,7 @@ public:
     Month(std::uint8_t number) : number_(number) {
         if (number_ > 11) {
             throw std::out_of_range(
-                "There's only 12 months"
+                "There are only 12 months"
             );
         }
     }
@@ -344,7 +345,7 @@ void bar(int i) {
 
     В одном \texttt{try} \slash \texttt{catch} блоке можно отловить более
     одного типа исключений.
-    Последовательность блоков \texttt{catch} важна:
+    Порядок блоков \texttt{catch} важен:
     при возникновении неоднозначности в выборе блока будет выбран первый.
 
     \begin{myinplacelisting}[minted language=cpp]
@@ -392,8 +393,8 @@ void bar(int i) {
 
     \frametitle{Stack unwinding}
 
-    После выбрасывания исключению поток управления переходит
-    в ближайший блок \texttt{catch} вниз по стекам фрейма.
+    После выбрасывания исключения поток управления переходит
+    в ближайший блок \texttt{catch} вниз по стеку вызовов.
     Вызываются деструкторы уже созданных объектов.
     Этот процесс называется \textit{размоткой стека} (stack
     unwinding).
@@ -423,7 +424,7 @@ int main() {
 
     \frametitle{Stack unwinding}
 
-    Пример вывод приложения с прошлого слайда:
+    Пример вывода приложения с прошлого слайда:
 
     \begin{terminalwindow}
 !\shellcommand{./a.out}!
@@ -471,7 +472,7 @@ Aborted (core dumped)
     \frametitle{Спецификатор \texttt{noexcept}}
 
     Функции, помеченные спецификатором \texttt{noexcept},
-    приведут к вызову \texttt{std::terminate}, если их них
+    приведут к вызову \texttt{std::terminate}, если из них
     будет выброшено исключение.
 
     \begin{myinplacelisting}[minted language=cpp]

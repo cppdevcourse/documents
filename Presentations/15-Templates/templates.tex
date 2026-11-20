@@ -125,7 +125,7 @@ struct A { void Foo(); };
 struct B { void Foo(); };
 struct C { void Foo(); };
 
-#define __FOO(X) do { (X).Foo(); } while (0);
+#define __FOO(X) do { (X).Foo(); } while (0)
     \end{myinplacelisting}
 
     \begin{task}
@@ -204,7 +204,7 @@ void swap(bool condition, int a, int b) {
 
     \begin{itemize}
       \item Неудобно писать (для поддержки многострочных макросов
-        необходимо в конец строки добалять символ продолжения
+        необходимо в конец строки добавлять символ продолжения
         \verb|/|).
       \item \enquote{Гетерогенность} макросов по отношению
         к обычным функциям.
@@ -226,7 +226,7 @@ void swap(bool condition, int a, int b) {
 
     \frametitle{Кодогенерация на шаблонах}
 
-    Другим возможным способом кодогенрации в C++ являются
+    Другим возможным способом кодогенерации в C++ являются
     \textit{шаблоны}\footnotemark{} (templates).
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/templates.html}}
@@ -296,7 +296,7 @@ int main() {
 0000000000000000 <char max<char>(char, char)>:
    0:   55                      push   %rbp
    1:   48 89 e5                mov    %rsp,%rbp
-   4:   40 88 f0                mov    %sil,%al
+   4:   89 fa                   mov    %edi,%edx
     \end{myinplacelisting}
 
   \end{frame}
@@ -310,6 +310,8 @@ int main() {
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/class\_template.html}}
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <cstddef>
+
 // template class is type parametrized
 template <class T>
 class Vector {
@@ -443,7 +445,7 @@ T inc(T t) {
       \node (int) [below right=0.5cm and -7cm of template, text width=4cm] {
         \begin{myinplacelisting}[minted language=cpp]
 int inc(int t) {
-    int v = t++;
+    int v = ++t;
     return v;
 }
         \end{myinplacelisting}
@@ -452,7 +454,7 @@ int inc(int t) {
       \node (long) [below right=0.5cm and -2cm of template, text width=4cm] {
         \begin{myinplacelisting}[minted language=cpp]
 long inc(long t) {
-    long v = t++;
+    long v = ++t;
     return v;
 }
         \end{myinplacelisting}
@@ -470,7 +472,7 @@ long inc(long t) {
     \frametitle{Параметр шаблона: константа}
 
     В качестве параметра шаблона также можно использовать
-    одно из значений конкретного типа\footnotemark{}.
+    значение конкретного типа\footnotemark{}.
     Для этого в объявлении шаблона указывается этот тип.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/template\_parameters.html\#Constant\_template\_parameter}}
@@ -624,10 +626,10 @@ class Map {
 
   \begin{frame}[fragile]
 
-    \frametitle{Аргументы по-умолчанию}
+    \frametitle{Аргументы по умолчанию}
 
     По аналогии с аргументами функции, шаблоны могут иметь
-    аргументы по-умолчанию\footnotemark{}.
+    аргументы по умолчанию\footnotemark{}.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/language/template\_parameters.html\#Default\_template\_arguments}}
 
@@ -645,7 +647,7 @@ struct Bar {};
 
     \frametitle{Объявление и определение шаблона}
 
-    Так же, как и у обычной функции, у шаблонной функции может быть
+    Так же как и у обычной функции, у шаблонной функции может быть
     объявление и определение:
 
     \begin{myinplacelisting}[minted language=cpp]
@@ -828,7 +830,7 @@ template void foo<int>(int t);
     окажется определение шаблона с нужным аргументом.
 
     \begin{terminalwindow}
-!\shellcommand{c++ -std=c++23 -c foo.o}!
+!\shellcommand{c++ -std=c++23 -c foo.cpp}!
 !\shellcommand{objdump -tC foo.o}!
 
 foo.o:     file format elf64-x86-64
@@ -836,7 +838,7 @@ foo.o:     file format elf64-x86-64
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*  0000000000000000 foo.cpp
 0000000000000000 l    d  .text._Z3fooIiEvT_     0000000000000000 .text._Z3fooIiEvT_
-0000000000000000  w    F .text._Z3fooIiEvT_     0000000000000009 !\colorbox{yellow}{void foo<int>(int)}!
+0000000000000000  w    F .text._Z3fooIiEvT_     0000000000000038 !\colorbox{yellow}{void foo<int>(int)}!
     \end{terminalwindow}
 
     \begin{task}
@@ -847,7 +849,7 @@ SYMBOL TABLE:
 
   \begin{frame}[fragile]
 
-    \frametitle{Специализиация шаблона}
+    \frametitle{Специализация шаблона}
 
     \textit{Специализация шаблона}\footnotemark{}
     позволяет написать отдельное определение
@@ -870,7 +872,7 @@ template <>
 struct Foo<void> {
     void Print() const {
         std::println("void...");
-    };
+    }
 };
     \end{myinplacelisting}
 
@@ -878,7 +880,7 @@ struct Foo<void> {
 
   \begin{frame}[fragile]
 
-    \frametitle{Специализиация шаблона}
+    \frametitle{Специализация шаблона}
 
     Инстанцирование учитывает специализации шаблонов:
 
@@ -903,9 +905,9 @@ void...
 
   \begin{frame}[fragile]
 
-    \frametitle{Частичная специализиация шаблона}
+    \frametitle{Частичная специализация шаблона}
 
-    Специализация шаблона, в которой аргументы есть для
+    Специализации шаблона, в которых аргументы есть для
     каждого параметра шаблона, называются \textit{полными}.
     Для шаблонных классов и шаблонных переменных можно
     определить также \textit{частичную специализацию}\footnotemark{}.
@@ -929,9 +931,9 @@ struct Foo<int, T> {};
 
   \begin{frame}[fragile]
 
-    \frametitle{Parameters pack}
+    \frametitle{Parameter pack}
 
-    Используя \textit{parameters pack}\footnotemark{},
+    Используя \textit{parameter pack}\footnotemark{},
     можно написать шаблон, который будет принимать произвольное
     количество аргументов.
 
@@ -950,10 +952,10 @@ int main() {
 
   \begin{frame}[fragile]
 
-    \frametitle{Parameters pack}
+    \frametitle{Parameter pack}
 
     Пример построения класса кортежа с использованием
-    paramateres pack:
+    parameter pack:
 
     \begin{myinplacelisting}[minted language=cpp]
 #include <print>
@@ -1007,7 +1009,7 @@ int main() {
 
     \frametitle{SFINAE}
 
-    Попробуем написать код для проверки возможности сложения объектов типа
+    Попробуем написать код для проверки возможности создания объектов типа
     во время компиляции при помощи SFINAE.
 
     Используем перегрузку функций.
@@ -1041,6 +1043,8 @@ int main() {
     использовать первую перегрузку и будет использовать вторую.
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <cstddef>
+
 template <class T>
 decltype(T{}, void()) test(std::nullptr_t) {}
 
@@ -1064,6 +1068,8 @@ int main() {
     Для более удобочитаемой ошибки можно использовать \verb|static_assert|.
 
     \begin{myinplacelisting}[minted language=cpp]
+#include <cstddef>
+
 struct Yes { char dummy[1]; };
 struct No { char dymmy[2]; };
 
@@ -1126,7 +1132,7 @@ int main() {
     \hfill \break
     Concepts позволяют в явном виде объявить набор требований к типу,
     который используется в шаблоне.
-    Компилятор выдаст понятную и ясную ошибку в случае, если данный тип
+    Компилятор выдаст понятную и ясную ошибку в случае если данный тип
     не удовлетворяет этим требованиям.
     Concepts можно сравнить с абстрактными классами в динамическом полиморфизме,
     только на этот раз полиморфизм статический.
@@ -1164,7 +1170,7 @@ int main() {
 
     \frametitle{Concepts}
 
-    Станадратная библиотека определяет набор concepts общего назначения\footnotemark{}.
+    Стандартная библиотека определяет набор concepts общего назначения\footnotemark{}.
 
     \footnotetext{\url{https://en.cppreference.com/w/cpp/concepts.html}}
 
@@ -1199,7 +1205,7 @@ concept MyConcept =
 
     Другим примером статического полиморфизма на шаблонах\break
     является \textit(CRTR) (\enquote{Curiously Recurring Template Pattern}).
-    Он позволяет организивать аналог виртуальных функций, который
+    Он позволяет организовать аналог виртуальных функций, который
     работает во время компиляции.
 
     \begin{myinplacelisting}[minted language=cpp]
