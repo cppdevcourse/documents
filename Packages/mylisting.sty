@@ -6,6 +6,28 @@
 \RequirePackage{kvoptions}
 \RequirePackage{accsupp}
 
+% Исправление копирования кода из PDF: в lualatex пробел catcode 10
+% в verbatim вёрстается как glue без глифа (стандартное
+% определение \FV@Space из fvextra), и PDF-вьюеры при копировании
+% теряют такие «невидимые» отступы.
+% Здесь пробел заменяется реальным глифом U+0020, а
+% \FancyVerbSpaceBreak сохраняется (разрыв строки на пробеле
+% при breaklines). Переопределение выполняется при входе в каждое
+% verbatim-окружение; запись добавляется в \FV@FormattingPrep@PreHook
+% позже записи \FV@DefFVSpace самого fvextra, поэтому выполняется
+% после неё и переопределяет \FV@Space. Режим showspaces
+% (видимые пробелы) не затрагивается. Блок устанавливается один раз:
+% этот же код есть и в terminal.sty, оба пакета могут быть
+% загружены в одном документе.
+\@ifundefined{FV@CopyableSpaceHook@done}{%
+  \gdef\FV@CopyableSpaceHook@done{}%
+  \g@addto@macro\FV@FormattingPrep@PreHook{%
+    \ifbool{FV@showspaces}{}{%
+      \def\FV@Space{\char"0020\FancyVerbSpaceBreak}%
+    }%
+  }%
+}{}%
+
 \SetupKeyvalOptions{
     family=MLS,
     prefix=MLS@
