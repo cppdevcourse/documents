@@ -22,7 +22,8 @@ BUILD_DIR := build
 	pr-13 \
 	pr-14 \
 	pr-15 \
-	pr-16
+	pr-16 \
+	pr-18
 
 all: build
 
@@ -42,7 +43,8 @@ build: \
 	pr-13 \
 	pr-14 \
 	pr-15 \
-	pr-16
+	pr-16 \
+	pr-18
 
 install: build
 	mkdir -p "$(PREFIX)/presentations"
@@ -62,6 +64,7 @@ install: build
 	cp "$(BUILD_DIR)/pr-14.pdf" "$(PREFIX)/presentations/14-dynamic-dispatch.pdf"
 	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-templates.pdf"
 	cp "$(BUILD_DIR)/pr-16.pdf" "$(PREFIX)/presentations/16-standard-library.pdf"
+	cp "$(BUILD_DIR)/pr-18.pdf" "$(PREFIX)/presentations/18-strings.pdf"
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -88,6 +91,7 @@ help:
 	@printf "pr-14\tbuild presentation pr-14.pdf\n"
 	@printf "pr-15\tbuild presentation pr-15.pdf\n"
 	@printf "pr-16\tbuild presentation pr-16.pdf\n"
+	@printf "pr-18\tbuild presentation pr-18.pdf\n"
 
 pr-01: pr-01.pdf
 pr-02: pr-02.pdf
@@ -105,6 +109,7 @@ pr-13: pr-13.pdf
 pr-14: pr-14.pdf
 pr-15: pr-15.pdf
 pr-16: pr-16.pdf
+pr-18: pr-18.pdf
 
 define generate_pdf
 	TEXINPUTS='$(shell pwd)//:' \
@@ -274,5 +279,17 @@ pr-16.pdf: \
 	Presentations/16-Stdlib/stdlib.tex \
 	Presentations/presentationtemplate.sty \
 	$(wildcard Presentations/images/*-logo.png) \
+	Packages/mylisting.sty
+	$(call generate_pdf,$<,$@)
+
+pr-18.pdf: \
+	Presentations/18-strings/strings.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	$(wildcard Presentations/18-strings/*.cpp) \
+	$(wildcard Presentations/18-strings/*.h) \
+	$(wildcard Presentations/18-strings/**/*.cpp) \
+	$(wildcard Presentations/18-strings/**/*.h) \
+	Packages/terminal.sty \
 	Packages/mylisting.sty
 	$(call generate_pdf,$<,$@)

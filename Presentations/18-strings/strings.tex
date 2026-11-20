@@ -1,0 +1,323 @@
+\documentclass[compress, 8pt, aspectratio=169]{beamer}
+
+\usepackage{presentationtemplate}
+\usepackage[askip=3mm, bskip=3mm]{terminal}
+\usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
+\tcbuselibrary{hooks}
+\usepackage{csquotes}
+
+\title{Стандартная библиотека: строки}
+
+\begin{document}
+
+  \frame[plain]{\titlepage}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Строки: \texttt{char[]} vs \texttt{std::string}}
+
+    \begin{itemize}
+
+      \item \texttt{char[]}: изменение посимвольно;
+        операторов сравнения и конкатенации нет; память \textendash \space вручную.
+
+      \item \texttt{std::string}: значение; память управляет объект;
+        строку можно переприсвоить целиком.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
+        {Presentations/18-strings/}
+        {why.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ why.cpp -o why \&\& ./why}!
+Eda
+Grace
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Создание строк}
+
+    \begin{itemize}
+
+      \item Инициализация: из литерала, из \texttt{(count, char)},
+        копирование, перемещение.
+
+      \item \texttt{(count, char)} \textendash \space повтор одного символа.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {create.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ create.cpp -o create \&\& ./create}!
+C++ ***** C++
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Конкатенация и сравнение}
+
+    \begin{itemize}
+
+      \item Конкатенация: \texttt{+}, \texttt{+=} (также \texttt{append}).
+
+      \item Сравнение: \texttt{<}, \texttt{==}, \texttt{<=>}
+        \textendash \space лексикографическое, побайтово.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {concat-compare.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ concat-compare.cpp -o concat-compare \&\& ./concat-compare}!
+true true
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Доступ к символам}
+
+    \begin{itemize}
+
+      \item \texttt{[]} \textendash \space без проверки границ (UB при выходе за них);
+        \texttt{at} \textendash \space бросает \texttt{std::out\_of\_range}.
+
+      \item \texttt{front}/\texttt{back};
+        \texttt{c\_str()}/\texttt{data()} \textendash \space строка как C-строка
+        (с завершающим нулём).
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {access.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ access.cpp -o access \&\& ./access}!
+C
++
++
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Поиск в строке}
+
+    \begin{itemize}
+
+      \item \texttt{find}/\texttt{rfind} \textendash \space позиция вхождения
+        или \texttt{std::string::npos}, если не найдено.
+
+      \item \texttt{starts\_with}/\texttt{ends\_with} \textendash \space C++20;
+        \texttt{contains} \textendash \space C++23.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
+        {Presentations/18-strings/}
+        {find.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ find.cpp -o find \&\& ./find}!
+16
+17
+true true true
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Подстроки: \texttt{substr}, \texttt{replace}, \texttt{erase}}
+
+    \begin{itemize}
+
+      \item \texttt{substr(pos, len)} \textendash \space копия подстроки
+        (без \texttt{len} \textendash \space до конца).
+
+      \item \texttt{replace(pos, len, str)} \textendash \space замена участка;
+        \texttt{erase(pos, len)} \textendash \space удаление участка.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {modify.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ modify.cpp -o modify \&\& ./modify}!
+world
+bye, world
+bye,
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Преобразование с числами}
+
+    \begin{itemize}
+
+      \item В строку: \texttt{std::to\_string} (числовые типы).
+
+      \item Из строки: \texttt{stoi}, \texttt{stoul}, \texttt{stof},
+        \texttt{stod}, ...; третий аргумент \textendash \space основание.
+
+      \item Ошибка парсинга \textendash \space исключение
+        \texttt{invalid\_argument}/\texttt{out\_of\_range}.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {convert.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ convert.cpp -o convert \&\& ./convert}!
+42
+3.14
+255
+100
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Small String Optimization (SSO)}
+
+    \begin{itemize}
+
+      \item Короткие строки хранятся в самом объекте (на стеке),
+        без выделения в куче.
+
+      \item Порог \textendash \space свойство реализации: libstdc++ (x86-64)
+        \textendash \space 15 символов, \texttt{sizeof(std::string)} = 32.
+
+      \item Проверяем по адресу \texttt{data()}: короткий
+        \textendash \space внутри объекта, длинный \textendash \space в куче.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
+        {Presentations/18-strings/}
+        {sso.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ sso.cpp -o sso \&\& ./sso}!
+32
+2: 0x7ffd4854fd00
+42: 0x5c2d7fb61360
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Unicode: строка \textendash \space это байты}
+
+    \begin{itemize}
+
+      \item \texttt{std::string} хранит байты; по соглашению \textendash \space UTF-8.
+
+      \item \texttt{size()}/\texttt{length()} \textendash \space число байт,
+        а не символов.
+
+      \item \texttt{s[i]} \textendash \space по байтам: многобайтовый символ
+        \enquote{разрывается}.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {utf8-bytes.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ utf8-bytes.cpp -o utf8-bytes \&\& ./utf8-bytes}!
+bytes: 6
+f0 9f 9a 80 68 69
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Обход по символам: \texttt{std::u8string\_view}}
+
+    \begin{itemize}
+
+      \item \texttt{std::u8string\_view} (C++20) \textendash \space вид
+        на UTF-8-байты; итерация идёт по байтам \texttt{char8\_t},
+        не по кодовым точкам.
+
+      \item Конструктора из \texttt{std::string} нет: делаем вид
+        на байты строки \textendash \space \enquote{строка \textendash \space просто байты}.
+
+      \item Число кодовых точек \textendash \space число непродолжающих
+        байт (не начинающихся с \texttt{0b10}).
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
+        {Presentations/18-strings/}
+        {u8string-view.cpp}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Вывод программы с листинга на прошлом слайде}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ u8string-view.cpp -o u8string-view \&\& ./u8string-view}!
+bytes: 12 chars: 6
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Строковый литерал \texttt{""s} (C++14)}
+
+    \begin{itemize}
+
+      \item Литерал \texttt{"...s"} \textendash \space объект
+        \texttt{std::string}; \texttt{"...sv"} (C++17)
+        \textendash \space \texttt{std::string\_view}.
+
+      \item Каждый литерал \textendash \space новое временное значение:
+        \texttt{"a"s + "b"} \textendash \space два временных \texttt{std::string}.
+
+      \item \texttt{using namespace std::literals::string\_literals}
+        \textendash \space стандартный способ активации.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {s-literal.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ s-literal.cpp -o s-literal \&\& ./s-literal}!
+C++ 23
+    \end{terminalwindow}
+
+  \end{frame}
+
+\end{document}
