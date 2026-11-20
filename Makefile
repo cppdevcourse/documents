@@ -23,7 +23,7 @@ BUILD_DIR := build
 	pr-14 \
 	pr-15 \
 	pr-16 \
-	pr-17
+	pr-17 \
 	pr-19
 
 all: build
@@ -45,7 +45,7 @@ build: \
 	pr-14 \
 	pr-15 \
 	pr-16 \
-	pr-17
+	pr-17 \
 	pr-19
 
 install: build
@@ -294,7 +294,8 @@ pr-17.pdf: \
 	$(wildcard Presentations/17-streams/*.cpp) \
 	$(wildcard Presentations/17-streams/*.h) \
 	$(wildcard Presentations/17-streams/**/*.cpp) \
-	$(wildcard Presentations/17-streams/**/*.h) \
+	$(wildcard Presentations/17-streams/**/*.h)
+	$(call generate_pdf,$<,$@)
 
 pr-19.pdf: \
 	Presentations/19-algorithms/algorithms.tex \
