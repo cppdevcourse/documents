@@ -1,0 +1,243 @@
+\documentclass[compress, 8pt, aspectratio=169]{beamer}
+
+\usepackage{presentationtemplate}
+\usepackage[askip=3mm, bskip=3mm]{terminal}
+\usepackage[linenosfontsize=\tiny, askip=3mm, bskip=3mm]{mylisting}
+\tcbuselibrary{hooks}
+
+\title{Стандартная библиотека: строки}
+
+\begin{document}
+
+  \frame[plain]{\titlepage}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Строки: \texttt{char[]} vs \texttt{std::string}}
+
+    \begin{columns}[T]
+
+      \begin{column}{0.48\textwidth}
+
+        \myinputlisting[minted language=cpp, minted options app={fontsize=\normalsize}]
+            {Presentations/18-strings/}
+            {why.cpp}
+
+      \end{column}
+
+      \begin{column}{0.52\textwidth}
+
+        \begin{terminalwindow}
+!\shellcommand{g++ why.cpp -o why \&\& ./why}!
+Eda
+Grace
+        \end{terminalwindow}
+
+      \end{column}
+
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Создание строк}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {create.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ create.cpp -o create \&\& ./create}!
+C++ ***** C++
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Конкатенация и сравнение}
+
+    \begin{itemize}
+
+      \item Конкатенация: \texttt{+}, \texttt{+=}, метод \texttt{append}.
+
+      \item Сравнение \texttt{<}, \texttt{==}, \texttt{<=>}
+        идёт лексикографически, побайтово.
+
+    \end{itemize}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {concat-compare.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ concat-compare.cpp -o concat-compare \&\& ./concat-compare}!
+true true
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Доступ к символам}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {access.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ access.cpp -o access \&\& ./access}!
+C
++
++
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Поиск в строке}
+
+    \begin{columns}[T]
+
+      \begin{column}{0.56\textwidth}
+
+        \myinputlisting[minted language=cpp, minted options app={fontsize=\normalsize}]
+            {Presentations/18-strings/}
+            {find.cpp}
+
+      \end{column}
+
+      \begin{column}{0.44\textwidth}
+
+        \begin{terminalwindow}
+!\shellcommand{g++ find.cpp -o find \&\& ./find}!
+16
+17
+true true true
+        \end{terminalwindow}
+
+      \end{column}
+
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Подстроки: \texttt{substr}, \texttt{replace}, \texttt{erase}}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {modify.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ modify.cpp -o modify \&\& ./modify}!
+world
+bye, world
+bye,
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Преобразование с числами}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {convert.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ convert.cpp -o convert \&\& ./convert}!
+42
+3.14
+255
+100
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}
+
+    \frametitle{Small String Optimization (SSO)}
+
+    \begin{itemize}
+
+      \item Короткие строки хранятся в самом объекте (на стеке),
+        без выделения в куче.
+
+      \item Создание, копирование и перемещение таких строк быстрее.
+
+      \item Порог зависит от реализации: в libstdc++ (x86-64)
+        это 15 символов, \texttt{sizeof(std::string)} = 32.
+
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{SSO: пример}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\normalsize}]
+        {Presentations/18-strings/}
+        {sso.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ sso.cpp -o sso \&\& ./sso}!
+32
+2: 0x7ffd4854fd00
+42: 0x5c2d7fb61360
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Unicode: строка \textemdash \space это байты}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {utf8-bytes.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ utf8-bytes.cpp -o utf8-bytes \&\& ./utf8-bytes}!
+bytes: 4
+d0 af 68 69
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Обход по символам: \texttt{std::u8string\_view}}
+
+    \myinputlisting[minted language=cpp, minted options app={fontsize=\footnotesize}]
+        {Presentations/18-strings/}
+        {u8string-view.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ u8string-view.cpp -o u8string-view \&\& ./u8string-view}!
+bytes: 12 chars: 6
+    \end{terminalwindow}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+
+    \frametitle{Строковый литерал \texttt{""s} (C++14)}
+
+    \myinputlisting[minted language=cpp]
+        {Presentations/18-strings/}
+        {s-literal.cpp}
+
+    \begin{terminalwindow}
+!\shellcommand{g++ s-literal.cpp -o s-literal \&\& ./s-literal}!
+C++ 23
+    \end{terminalwindow}
+
+  \end{frame}
+
+\end{document}

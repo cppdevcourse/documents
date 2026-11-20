@@ -24,6 +24,7 @@ BUILD_DIR := build
 	pr-15 \
 	pr-16 \
 	pr-17 \
+	pr-18 \
 	pr-19
 
 all: build
@@ -46,6 +47,7 @@ build: \
 	pr-15 \
 	pr-16 \
 	pr-17 \
+	pr-18 \
 	pr-19
 
 install: build
@@ -67,6 +69,7 @@ install: build
 	cp "$(BUILD_DIR)/pr-15.pdf" "$(PREFIX)/presentations/15-templates.pdf"
 	cp "$(BUILD_DIR)/pr-16.pdf" "$(PREFIX)/presentations/16-standard-library.pdf"
 	cp "$(BUILD_DIR)/pr-17.pdf" "$(PREFIX)/presentations/17-streams.pdf"
+	cp "$(BUILD_DIR)/pr-18.pdf" "$(PREFIX)/presentations/18-strings.pdf"
 	cp "$(BUILD_DIR)/pr-19.pdf" "$(PREFIX)/presentations/19-algorithms.pdf"
 
 clean:
@@ -95,6 +98,7 @@ help:
 	@printf "pr-15\tbuild presentation pr-15.pdf\n"
 	@printf "pr-16\tbuild presentation pr-16.pdf\n"
 	@printf "pr-17\tbuild presentation pr-17.pdf\n"
+	@printf "pr-18\tbuild presentation pr-18.pdf\n"
 	@printf "pr-19\tbuild presentation pr-19.pdf\n"
 
 pr-01: pr-01.pdf
@@ -114,6 +118,7 @@ pr-14: pr-14.pdf
 pr-15: pr-15.pdf
 pr-16: pr-16.pdf
 pr-17: pr-17.pdf
+pr-18: pr-18.pdf
 pr-19: pr-19.pdf
 
 # Кодовые файлы листингов (minted) — рекурсивно до 3 уровней вложенности;
@@ -305,6 +310,18 @@ pr-17.pdf: \
 	Packages/terminal.sty \
 	Packages/mylisting.sty
 	$(call generate_pdf,Presentations/17-streams/streams.tex)
+
+pr-18.pdf: \
+	Presentations/18-strings/strings.tex \
+	Presentations/presentationtemplate.sty \
+	$(wildcard Presentations/images/*-logo.png) \
+	$(wildcard Presentations/18-strings/*.cpp) \
+	$(wildcard Presentations/18-strings/*.h) \
+	$(wildcard Presentations/18-strings/**/*.cpp) \
+	$(wildcard Presentations/18-strings/**/*.h) \
+	Packages/terminal.sty \
+	Packages/mylisting.sty
+	$(call generate_pdf,$<,$@)
 
 pr-19.pdf: \
 	Presentations/19-algorithms/algorithms.tex \
